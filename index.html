@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>HDPE Pipe Selector</title>
+  <style>
+    :root {
+      --bg: #f6f8fc;
+      --card: #ffffff;
+      --text: #243043;
+      --muted: #667085;
+      --line: #e7edf6;
+      --pastel-1: #dbeafe;
+      --pastel-2: #ede9fe;
+      --pastel-3: #dcfce7;
+      --pastel-4: #ffe4e6;
+      --btn: #9db7ff;
+      --btn2: #b9a6ff;
+      --shadow: 0 10px 30px rgba(36,48,67,.06);
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+      background: linear-gradient(180deg, #f8fbff 0%, #f6f8fc 100%);
+      color: var(--text);
+    }
+    .wrap {
+      max-width: 1250px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .title {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: end;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    h1 {
+      margin: 0;
+      font-size: 28px;
+      letter-spacing: -0.02em;
+    }
+    .sub {
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 2px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 16px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 16px;
+    }
+    .card h2 {
+      margin: 0 0 12px;
+      font-size: 18px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      color: #334155;
+      background: #eef4ff;
+      margin: 0 8px 8px 0;
+    }
+    .ref-scroll {
+      overflow-x: auto;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, #fff, #fbfcff);
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    th, td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+      text-align: center;
+      white-space: nowrap;
+      font-size: 14px;
+    }
+    th {
+      background: #f8fbff;
+      font-weight: 700;
+      color: #334155;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+    tr:hover td {
+      background: #fcfdff;
+    }
+    .ref-table th, .ref-table td {
+      min-width: 78px;
+    }
+    .ref-table td:first-child, .ref-table th:first-child {
+      min-width: 110px;
+      position: sticky;
+      left: 0;
+      background: #f8fbff;
+      z-index: 2;
+      text-align: left;
+    }
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .controls-2 {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 10px;
+      margin-bottom: 12px;
+      align-items: end;
+    }
+    label {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin: 0 0 6px;
+    }
+    select, input {
+      width: 100%;
+      border: 1px solid #d9e2ef;
+      background: #f8fbff;
+      border-radius: 12px;
+      padding: 11px 12px;
+      font: inherit;
+      outline: none;
+    }
+    select:focus, input:focus {
+      border-color: #b8c8ff;
+      box-shadow: 0 0 0 4px rgba(157,183,255,.18);
+    }
+    button {
+      border: 0;
+      border-radius: 12px;
+      padding: 11px 14px;
+      font: inherit;
+      cursor: pointer;
+      color: #fff;
+      background: linear-gradient(135deg, var(--btn), var(--btn2));
+      box-shadow: 0 8px 18px rgba(157,183,255,.25);
+    }
+    button.secondary {
+      background: #eef2ff;
+      color: #46567b;
+      box-shadow: none;
+      border: 1px solid #dde4ff;
+    }
+    .result {
+      background: linear-gradient(180deg, #ffffff, #fbfcff);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px;
+      margin-top: 8px;
+    }
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .pill {
+      background: #f8fbff;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 10px 12px;
+    }
+    .pill .k {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .pill .v {
+      font-size: 16px;
+      font-weight: 700;
+    }
+    .section-note {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 4px;
+    }
+    .stack {
+      display: grid;
+      gap: 12px;
+    }
+    .muted {
+      color: var(--muted);
+    }
+    .subhead {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+    .small {
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .nowrap {
+      white-space: nowrap;
+    }
+    .table-wrap {
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fff;
+    }
+    .empty {
+      padding: 16px;
+      text-align: center;
+      color: var(--muted);
+    }
+    .hint {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+    @media (max-width: 980px) {
+      .grid, .result-grid, .controls, .controls-2 {
+        grid-template-columns: 1fr;
+      }
+      .ref-table th:first-child, .ref-table td:first-child {
+        position: static;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="title">
+      <div>
+        <h1>HDPE Pipe Selector</h1>
+        <div class="sub">Built from your Excel sheet only — exact data, equivalent combinations, and ID search.</div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px;">
+      <h2>OD reference</h2>
+      <div class="ref-scroll">
+        <table class="ref-table" id="refTable">
+          <thead>
+            <tr><th>OD Inch</th></tr>
+          </thead>
+          <tbody>
+            <tr><th>OD MM</th></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="hint">Reference table follows your sheet and is shown at the top for quick checking.</div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <div class="subhead">
+          <h2>Search by OD + Grade + PN</h2>
+          <div class="small">Equivalent combinations shown below the result</div>
+        </div>
+
+        <div class="controls">
+          <div>
+            <label for="odSel">OD MM</label>
+            <select id="odSel"></select>
+          </div>
+          <div>
+            <label for="gradeSel">Grade</label>
+            <select id="gradeSel"></select>
+          </div>
+          <div>
+            <label for="pnSel">PN</label>
+            <select id="pnSel"></select>
+          </div>
+          <div style="display:flex; align-items:end; gap:10px;">
+            <button id="findBtn" style="width:100%;">Find exact row</button>
+          </div>
+        </div>
+
+        <div id="exactResult" class="result">
+          <div class="empty">Choose OD, Grade and PN to see the exact row.</div>
+        </div>
+
+        <div style="margin-top:14px;">
+          <div class="subhead">
+            <h2 style="margin-bottom:0;">Equivalent combinations</h2>
+            <div class="small">Same OD and same wall thickness range (Min/Max)</div>
+          </div>
+          <div class="table-wrap">
+            <table id="equivTable">
+              <thead>
+                <tr>
+                  <th>OD MM</th>
+                  <th>Grade</th>
+                  <th>PN</th>
+                  <th>Min</th>
+                  <th>Max</th>
+                  <th>ID MM</th>
+                  <th>Wgt</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td colspan="7" class="empty">Equivalent combinations will appear here.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="subhead">
+          <h2>Search by ID MM</h2>
+          <div class="small">Default range: ±0.05 mm</div>
+        </div>
+
+        <div class="controls-2">
+          <div>
+            <label for="idInput">ID MM</label>
+            <input id="idInput" type="number" step="0.01" placeholder="Example: 0.70" />
+          </div>
+          <div>
+            <label for="tolInput">Tolerance</label>
+            <input id="tolInput" type="number" step="0.01" value="0.05" />
+          </div>
+          <div>
+            <button id="idBtn">Search</button>
+          </div>
+        </div>
+
+        <div id="idSummary" class="result">
+          <div class="empty">Enter ID and press Search.</div>
+        </div>
+
+        <div style="margin-top:14px;">
+          <div class="table-wrap">
+            <table id="idTable">
+              <thead>
+                <tr>
+                  <th>OD MM</th>
+                  <th>Grade</th>
+                  <th>PN</th>
+                  <th>Min</th>
+                  <th>Max</th>
+                  <th>ID MM</th>
+                  <th>Wgt</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td colspan="7" class="empty">No ID search performed yet.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+const PIPE_DATA = [{"od_mm":20,"od_inch":0.787,"grade":"PE 80","pn":"PN 20","min":3.4,"max":3.9,"id_mm":0.6437007874015749,"weight":0.181},{"od_mm":20,"od_inch":0.787,"grade":"PE 80","pn":"PN 16","min":2.8,"max":3.2,"id_mm":0.6692913385826772,"weight":0.154},{"od_mm":20,"od_inch":0.787,"grade":"PE 100","pn":"PN 20","min":2.8,"max":3.2,"id_mm":0.6692913385826772,"weight":0.154},{"od_mm":20,"od_inch":0.787,"grade":"PE 80","pn":"PN 12.5","min":2.3,"max":2.7,"id_mm":0.6889763779527559,"weight":0.132},{"od_mm":20,"od_inch":0.787,"grade":"PE 100","pn":"PN 16","min":2.3,"max":2.7,"id_mm":0.6889763779527559,"weight":0.132},{"od_mm":20,"od_inch":0.787,"grade":"PE 63","pn":"PN 8","min":2.0,"max":2.3,"id_mm":0.7027559055118111,"weight":0.116},{"od_mm":20,"od_inch":0.787,"grade":"PE 80","pn":"PN 10","min":2.0,"max":2.3,"id_mm":0.7027559055118111,"weight":0.116},{"od_mm":20,"od_inch":0.787,"grade":"PE 100","pn":"PN 12.5","min":2.0,"max":2.3,"id_mm":0.7027559055118111,"weight":0.116},{"od_mm":25,"od_inch":0.984,"grade":"PE 80","pn":"PN 20","min":4.2,"max":4.8,"id_mm":0.8070866141732284,"weight":0.279},{"od_mm":25,"od_inch":0.984,"grade":"PE 80","pn":"PN 16","min":3.4,"max":3.9,"id_mm":0.8405511811023623,"weight":0.235},{"od_mm":25,"od_inch":0.984,"grade":"PE 100","pn":"PN 20","min":3.4,"max":3.9,"id_mm":0.8405511811023623,"weight":0.235},{"od_mm":25,"od_inch":0.984,"grade":"PE 80","pn":"PN 12.5","min":2.8,"max":3.2,"id_mm":0.8661417322834646,"weight":0.199},{"od_mm":25,"od_inch":0.984,"grade":"PE 100","pn":"PN 16","min":2.8,"max":3.2,"id_mm":0.8661417322834646,"weight":0.199},{"od_mm":25,"od_inch":0.984,"grade":"PE 63","pn":"PN 8","min":2.3,"max":2.7,"id_mm":0.8858267716535434,"weight":0.17},{"od_mm":25,"od_inch":0.984,"grade":"PE 80","pn":"PN 10","min":2.3,"max":2.7,"id_mm":0.8858267716535434,"weight":0.17},{"od_mm":25,"od_inch":0.984,"grade":"PE 100","pn":"PN 12.5","min":2.3,"max":2.7,"id_mm":0.8858267716535434,"weight":0.17},{"od_mm":25,"od_inch":0.984,"grade":"PE 63","pn":"PN 6","min":2.0,"max":2.3,"id_mm":0.8996062992125985,"weight":0.148},{"od_mm":25,"od_inch":0.984,"grade":"PE 80","pn":"PN 8","min":2.0,"max":2.3,"id_mm":0.8996062992125985,"weight":0.148},{"od_mm":25,"od_inch":0.984,"grade":"PE 100","pn":"PN 10","min":2.0,"max":2.3,"id_mm":0.8996062992125985,"weight":0.148},{"od_mm":32,"od_inch":1.26,"grade":"PE 80","pn":"PN 20","min":5.4,"max":6.1,"id_mm":1.033464566929134,"weight":0.455},{"od_mm":32,"od_inch":1.26,"grade":"PE 80","pn":"PN 16","min":4.4,"max":5.0,"id_mm":1.0748031496062993,"weight":0.387},{"od_mm":32,"od_inch":1.26,"grade":"PE 100","pn":"PN 20","min":4.4,"max":5.0,"id_mm":1.0748031496062993,"weight":0.387},{"od_mm":32,"od_inch":1.26,"grade":"PE 80","pn":"PN 12.5","min":3.6,"max":4.1,"id_mm":1.108267716535433,"weight":0.327},{"od_mm":32,"od_inch":1.26,"grade":"PE 100","pn":"PN 16","min":3.6,"max":4.1,"id_mm":1.108267716535433,"weight":0.327},{"od_mm":32,"od_inch":1.26,"grade":"PE 63","pn":"PN 8","min":3.0,"max":3.4,"id_mm":1.1338582677165354,"weight":0.278},{"od_mm":32,"od_inch":1.26,"grade":"PE 80","pn":"PN 10","min":3.0,"max":3.4,"id_mm":1.1338582677165354,"weight":0.278},{"od_mm":32,"od_inch":1.26,"grade":"PE 100","pn":"PN 12.5","min":3.0,"max":3.4,"id_mm":1.1338582677165354,"weight":0.278},{"od_mm":32,"od_inch":1.26,"grade":"PE 63","pn":"PN 6","min":2.4,"max":2.8,"id_mm":1.1574803149606299,"weight":0.231},{"od_mm":32,"od_inch":1.26,"grade":"PE 80","pn":"PN 8","min":2.4,"max":2.8,"id_mm":1.1574803149606299,"weight":0.231},{"od_mm":32,"od_inch":1.26,"grade":"PE 100","pn":"PN 10","min":2.4,"max":2.8,"id_mm":1.1574803149606299,"weight":0.231},{"od_mm":32,"od_inch":1.26,"grade":"PE 63","pn":"PN 5","min":2.0,"max":2.3,"id_mm":1.175196850393701,"weight":0.194},{"od_mm":32,"od_inch":1.26,"grade":"PE 80","pn":"PN 6","min":2.0,"max":2.3,"id_mm":1.175196850393701,"weight":0.194},{"od_mm":32,"od_inch":1.26,"grade":"PE 100","pn":"PN 8","min":2.0,"max":2.3,"id_mm":1.175196850393701,"weight":0.194},{"od_mm":40,"od_inch":1.575,"grade":"PE 80","pn":"PN 20","min":6.7,"max":7.5,"id_mm":1.295275590551181,"weight":0.705},{"od_mm":40,"od_inch":1.575,"grade":"PE 80","pn":"PN 16","min":5.5,"max":6.2,"id_mm":1.344488188976378,"weight":0.603},{"od_mm":40,"od_inch":1.575,"grade":"PE 100","pn":"PN 20","min":5.5,"max":6.2,"id_mm":1.344488188976378,"weight":0.603},{"od_mm":40,"od_inch":1.575,"grade":"PE 80","pn":"PN 12.5","min":4.5,"max":5.1,"id_mm":1.3858267716535435,"weight":0.51},{"od_mm":40,"od_inch":1.575,"grade":"PE 100","pn":"PN 16","min":4.5,"max":5.1,"id_mm":1.3858267716535435,"weight":0.51},{"od_mm":40,"od_inch":1.575,"grade":"PE 63","pn":"PN 8","min":3.7,"max":4.2,"id_mm":1.419291338582677,"weight":0.43},{"od_mm":40,"od_inch":1.575,"grade":"PE 80","pn":"PN 10","min":3.7,"max":4.2,"id_mm":1.419291338582677,"weight":0.43},{"od_mm":40,"od_inch":1.575,"grade":"PE 100","pn":"PN 12.5","min":3.7,"max":4.2,"id_mm":1.419291338582677,"weight":0.43},{"od_mm":40,"od_inch":1.575,"grade":"PE 63","pn":"PN 6","min":3.0,"max":3.4,"id_mm":1.4488188976377951,"weight":0.355},{"od_mm":40,"od_inch":1.575,"grade":"PE 80","pn":"PN 8","min":3.0,"max":3.4,"id_mm":1.4488188976377951,"weight":0.355},{"od_mm":40,"od_inch":1.575,"grade":"PE 100","pn":"PN 10","min":3.0,"max":3.4,"id_mm":1.4488188976377951,"weight":0.355},{"od_mm":40,"od_inch":1.575,"grade":"PE 63","pn":"PN 5","min":2.4,"max":2.8,"id_mm":1.4724409448818898,"weight":0.293},{"od_mm":40,"od_inch":1.575,"grade":"PE 80","pn":"PN 6","min":2.4,"max":2.8,"id_mm":1.4724409448818898,"weight":0.293},{"od_mm":40,"od_inch":1.575,"grade":"PE 100","pn":"PN 8","min":2.4,"max":2.8,"id_mm":1.4724409448818898,"weight":0.293},{"od_mm":40,"od_inch":1.575,"grade":"PE 63","pn":"PN 4","min":2.0,"max":2.3,"id_mm":1.4901574803149609,"weight":0.246},{"od_mm":40,"od_inch":1.575,"grade":"PE 80","pn":"PN 5","min":2.0,"max":2.3,"id_mm":1.4901574803149609,"weight":0.246},{"od_mm":40,"od_inch":1.575,"grade":"PE 100","pn":"PN 6","min":2.0,"max":2.3,"id_mm":1.4901574803149609,"weight":0.246},{"od_mm":50,"od_inch":1.969,"grade":"PE 80","pn":"PN 20","min":8.4,"max":9.4,"id_mm":1.6181102362204727,"weight":1.103},{"od_mm":50,"od_inch":1.969,"grade":"PE 80","pn":"PN 16","min":6.8,"max":7.6,"id_mm":1.68503937007874,"weight":0.929},{"od_mm":50,"od_inch":1.969,"grade":"PE 100","pn":"PN 20","min":6.8,"max":7.6,"id_mm":1.68503937007874,"weight":0.929},{"od_mm":50,"od_inch":1.969,"grade":"PE 80","pn":"PN 12.5","min":5.6,"max":6.3,"id_mm":1.734251968503937,"weight":0.79},{"od_mm":50,"od_inch":1.969,"grade":"PE 100","pn":"PN 16","min":5.6,"max":6.3,"id_mm":1.734251968503937,"weight":0.79},{"od_mm":50,"od_inch":1.969,"grade":"PE 63","pn":"PN 8","min":4.6,"max":5.2,"id_mm":1.7755905511811025,"weight":0.666},{"od_mm":50,"od_inch":1.969,"grade":"PE 80","pn":"PN 10","min":4.6,"max":5.2,"id_mm":1.7755905511811025,"weight":0.666},{"od_mm":50,"od_inch":1.969,"grade":"PE 100","pn":"PN 12.5","min":4.6,"max":5.2,"id_mm":1.7755905511811025,"weight":0.666},{"od_mm":50,"od_inch":1.969,"grade":"PE 63","pn":"PN 6","min":3.7,"max":4.2,"id_mm":1.8129921259842519,"weight":0.548},{"od_mm":50,"od_inch":1.969,"grade":"PE 80","pn":"PN 8","min":3.7,"max":4.2,"id_mm":1.8129921259842519,"weight":0.548},{"od_mm":50,"od_inch":1.969,"grade":"PE 100","pn":"PN 10","min":3.7,"max":4.2,"id_mm":1.8129921259842519,"weight":0.548},{"od_mm":50,"od_inch":1.969,"grade":"PE 63","pn":"PN 5","min":3.0,"max":3.4,"id_mm":1.8425196850393701,"weight":0.451},{"od_mm":50,"od_inch":1.969,"grade":"PE 80","pn":"PN 6","min":3.0,"max":3.4,"id_mm":1.8425196850393701,"weight":0.451},{"od_mm":50,"od_inch":1.969,"grade":"PE 100","pn":"PN 8","min":3.0,"max":3.4,"id_mm":1.8425196850393701,"weight":0.451},{"od_mm":50,"od_inch":1.969,"grade":"PE 63","pn":"PN 4","min":2.4,"max":2.8,"id_mm":1.8661417322834646,"weight":0.371},{"od_mm":50,"od_inch":1.969,"grade":"PE 80","pn":"PN 5","min":2.4,"max":2.8,"id_mm":1.8661417322834646,"weight":0.371},{"od_mm":50,"od_inch":1.969,"grade":"PE 100","pn":"PN 6","min":2.4,"max":2.8,"id_mm":1.8661417322834646,"weight":0.371},{"od_mm":50,"od_inch":1.969,"grade":"PE 63","pn":"PN 3.2","min":2.0,"max":2.3,"id_mm":1.8838582677165356,"weight":0.31},{"od_mm":50,"od_inch":1.969,"grade":"PE 80","pn":"PN 4","min":2.0,"max":2.3,"id_mm":1.8838582677165356,"weight":0.31},{"od_mm":50,"od_inch":1.969,"grade":"PE 100","pn":"PN 5","min":2.0,"max":2.3,"id_mm":1.8838582677165356,"weight":0.31},{"od_mm":63,"od_inch":2.48,"grade":"PE 80","pn":"PN 20","min":10.5,"max":11.7,"id_mm":2.043307086614173,"weight":1.735},{"od_mm":63,"od_inch":2.48,"grade":"PE 80","pn":"PN 16","min":8.6,"max":9.6,"id_mm":2.1220472440944884,"weight":1.478},{"od_mm":63,"od_inch":2.48,"grade":"PE 100","pn":"PN 20","min":8.6,"max":9.6,"id_mm":2.1220472440944884,"weight":1.478},{"od_mm":63,"od_inch":2.48,"grade":"PE 80","pn":"PN 12.5","min":7.0,"max":7.8,"id_mm":2.188976377952756,"weight":1.239},{"od_mm":63,"od_inch":2.48,"grade":"PE 100","pn":"PN 16","min":7.0,"max":7.8,"id_mm":2.188976377952756,"weight":1.239},{"od_mm":63,"od_inch":2.48,"grade":"PE 63","pn":"PN 8","min":5.8,"max":6.5,"id_mm":2.2381889763779528,"weight":1.053},{"od_mm":63,"od_inch":2.48,"grade":"PE 80","pn":"PN 10","min":5.8,"max":6.5,"id_mm":2.2381889763779528,"weight":1.053},{"od_mm":63,"od_inch":2.48,"grade":"PE 100","pn":"PN 12.5","min":5.8,"max":6.5,"id_mm":2.2381889763779528,"weight":1.053},{"od_mm":63,"od_inch":2.48,"grade":"PE 63","pn":"PN 6","min":4.7,"max":5.3,"id_mm":2.283464566929134,"weight":0.874},{"od_mm":63,"od_inch":2.48,"grade":"PE 80","pn":"PN 8","min":4.7,"max":5.3,"id_mm":2.283464566929134,"weight":0.874},{"od_mm":63,"od_inch":2.48,"grade":"PE 100","pn":"PN 10","min":4.7,"max":5.3,"id_mm":2.283464566929134,"weight":0.874},{"od_mm":63,"od_inch":2.48,"grade":"PE 63","pn":"PN 5","min":3.8,"max":4.3,"id_mm":2.320866141732284,"weight":0.719},{"od_mm":63,"od_inch":2.48,"grade":"PE 80","pn":"PN 6","min":3.8,"max":4.3,"id_mm":2.320866141732284,"weight":0.719},{"od_mm":63,"od_inch":2.48,"grade":"PE 100","pn":"PN 8","min":3.8,"max":4.3,"id_mm":2.320866141732284,"weight":0.719},{"od_mm":63,"od_inch":2.48,"grade":"PE 63","pn":"PN 4","min":3.0,"max":3.4,"id_mm":2.354330708661417,"weight":0.576},{"od_mm":63,"od_inch":2.48,"grade":"PE 80","pn":"PN 5","min":3.0,"max":3.4,"id_mm":2.354330708661417,"weight":0.576},{"od_mm":63,"od_inch":2.48,"grade":"PE 100","pn":"PN 6","min":3.0,"max":3.4,"id_mm":2.354330708661417,"weight":0.576},{"od_mm":63,"od_inch":2.48,"grade":"PE 63","pn":"PN 3.2","min":2.5,"max":2.9,"id_mm":2.3740157480314963,"weight":0.49},{"od_mm":63,"od_inch":2.48,"grade":"PE 80","pn":"PN 4","min":2.5,"max":2.9,"id_mm":2.3740157480314963,"weight":0.49},{"od_mm":63,"od_inch":2.48,"grade":"PE 100","pn":"PN 5","min":2.5,"max":2.9,"id_mm":2.3740157480314963,"weight":0.49},{"od_mm":75,"od_inch":2.953,"grade":"PE 80","pn":"PN 20","min":12.5,"max":13.9,"id_mm":2.4330708661417324,"weight":2.458},{"od_mm":75,"od_inch":2.953,"grade":"PE 80","pn":"PN 16","min":10.2,"max":11.4,"id_mm":2.5275590551181106,"weight":2.089},{"od_mm":75,"od_inch":2.953,"grade":"PE 100","pn":"PN 20","min":10.2,"max":11.4,"id_mm":2.5275590551181106,"weight":2.089},{"od_mm":75,"od_inch":2.953,"grade":"PE 80","pn":"PN 12.5","min":8.4,"max":9.4,"id_mm":2.6023622047244093,"weight":1.772},{"od_mm":75,"od_inch":2.953,"grade":"PE 100","pn":"PN 16","min":8.4,"max":9.4,"id_mm":2.6023622047244093,"weight":1.772},{"od_mm":75,"od_inch":2.953,"grade":"PE 63","pn":"PN 8","min":6.9,"max":7.7,"id_mm":2.6653543307086616,"weight":1.489},{"od_mm":75,"od_inch":2.953,"grade":"PE 80","pn":"PN 10","min":6.9,"max":7.7,"id_mm":2.6653543307086616,"weight":1.489},{"od_mm":75,"od_inch":2.953,"grade":"PE 100","pn":"PN 12.5","min":6.9,"max":7.7,"id_mm":2.6653543307086616,"weight":1.489},{"od_mm":75,"od_inch":2.953,"grade":"PE 63","pn":"PN 6","min":5.6,"max":6.3,"id_mm":2.718503937007874,"weight":1.238},{"od_mm":75,"od_inch":2.953,"grade":"PE 80","pn":"PN 8","min":5.6,"max":6.3,"id_mm":2.718503937007874,"weight":1.238},{"od_mm":75,"od_inch":2.953,"grade":"PE 100","pn":"PN 10","min":5.6,"max":6.3,"id_mm":2.718503937007874,"weight":1.238},{"od_mm":75,"od_inch":2.953,"grade":"PE 63","pn":"PN 5","min":4.5,"max":5.1,"id_mm":2.7637795275590555,"weight":1.015},{"od_mm":75,"od_inch":2.953,"grade":"PE 80","pn":"PN 6","min":4.5,"max":5.1,"id_mm":2.7637795275590555,"weight":1.015},{"od_mm":75,"od_inch":2.953,"grade":"PE 100","pn":"PN 8","min":4.5,"max":5.1,"id_mm":2.7637795275590555,"weight":1.015},{"od_mm":75,"od_inch":2.953,"grade":"PE 63","pn":"PN 4","min":3.6,"max":4.1,"id_mm":2.801181102362205,"weight":0.825},{"od_mm":75,"od_inch":2.953,"grade":"PE 80","pn":"PN 5","min":3.6,"max":4.1,"id_mm":2.801181102362205,"weight":0.825},{"od_mm":75,"od_inch":2.953,"grade":"PE 100","pn":"PN 6","min":3.6,"max":4.1,"id_mm":2.801181102362205,"weight":0.825},{"od_mm":75,"od_inch":2.953,"grade":"PE 63","pn":"PN 3.2","min":2.9,"max":3.3,"id_mm":2.830708661417323,"weight":0.671},{"od_mm":75,"od_inch":2.953,"grade":"PE 80","pn":"PN 4","min":2.9,"max":3.3,"id_mm":2.830708661417323,"weight":0.671},{"od_mm":75,"od_inch":2.953,"grade":"PE 100","pn":"PN 5","min":2.9,"max":3.3,"id_mm":2.830708661417323,"weight":0.671},{"od_mm":75,"od_inch":2.953,"grade":"PE 63","pn":"PN 2.5","min":2.3,"max":2.7,"id_mm":2.8543307086614176,"weight":0.546},{"od_mm":75,"od_inch":2.953,"grade":"PE 80","pn":"PN 3.2","min":2.3,"max":2.7,"id_mm":2.8543307086614176,"weight":0.546},{"od_mm":75,"od_inch":2.953,"grade":"PE 100","pn":"PN 4","min":2.3,"max":2.7,"id_mm":2.8543307086614176,"weight":0.546},{"od_mm":75,"od_inch":2.953,"grade":"PE 63","pn":"PN 2","min":2.0,"max":2.3,"id_mm":2.8681102362204722,"weight":0.472},{"od_mm":75,"od_inch":2.953,"grade":"PE 80","pn":"PN 2.5","min":2.0,"max":2.3,"id_mm":2.8681102362204722,"weight":0.472},{"od_mm":75,"od_inch":2.953,"grade":"PE 100","pn":"PN 3.2","min":2.0,"max":2.3,"id_mm":2.8681102362204722,"weight":0.472},{"od_mm":90,"od_inch":3.543,"grade":"PE 80","pn":"PN 20","min":15.0,"max":16.6,"id_mm":2.921259842519685,"weight":3.533},{"od_mm":90,"od_inch":3.543,"grade":"PE 80","pn":"PN 16","min":12.2,"max":13.6,"id_mm":3.0354330708661417,"weight":2.997},{"od_mm":90,"od_inch":3.543,"grade":"PE 100","pn":"PN 20","min":12.2,"max":13.6,"id_mm":3.0354330708661417,"weight":2.997},{"od_mm":90,"od_inch":3.543,"grade":"PE 80","pn":"PN 12.5","min":10.0,"max":11.1,"id_mm":3.127952755905512,"weight":2.526},{"od_mm":90,"od_inch":3.543,"grade":"PE 100","pn":"PN 16","min":10.0,"max":11.1,"id_mm":3.127952755905512,"weight":2.526},{"od_mm":90,"od_inch":3.543,"grade":"PE 63","pn":"PN 8","min":8.2,"max":9.2,"id_mm":3.2007874015748032,"weight":2.131},{"od_mm":90,"od_inch":3.543,"grade":"PE 80","pn":"PN 10","min":8.2,"max":9.2,"id_mm":3.2007874015748032,"weight":2.131},{"od_mm":90,"od_inch":3.543,"grade":"PE 100","pn":"PN 12.5","min":8.2,"max":9.2,"id_mm":3.2007874015748032,"weight":2.131},{"od_mm":90,"od_inch":3.543,"grade":"PE 63","pn":"PN 6","min":6.7,"max":7.5,"id_mm":3.2637795275590555,"weight":1.773},{"od_mm":90,"od_inch":3.543,"grade":"PE 80","pn":"PN 8","min":6.7,"max":7.5,"id_mm":3.2637795275590555,"weight":1.773},{"od_mm":90,"od_inch":3.543,"grade":"PE 100","pn":"PN 10","min":6.7,"max":7.5,"id_mm":3.2637795275590555,"weight":1.773},{"od_mm":90,"od_inch":3.543,"grade":"PE 63","pn":"PN 5","min":5.3,"max":6.0,"id_mm":3.3208661417322833,"weight":1.436},{"od_mm":90,"od_inch":3.543,"grade":"PE 80","pn":"PN 6","min":5.3,"max":6.0,"id_mm":3.3208661417322833,"weight":1.436},{"od_mm":90,"od_inch":3.543,"grade":"PE 100","pn":"PN 8","min":5.3,"max":6.0,"id_mm":3.3208661417322833,"weight":1.436},{"od_mm":90,"od_inch":3.543,"grade":"PE 63","pn":"PN 4","min":4.3,"max":4.9,"id_mm":3.362204724409449,"weight":1.183},{"od_mm":90,"od_inch":3.543,"grade":"PE 80","pn":"PN 5","min":4.3,"max":4.9,"id_mm":3.362204724409449,"weight":1.183},{"od_mm":90,"od_inch":3.543,"grade":"PE 100","pn":"PN 6","min":4.3,"max":4.9,"id_mm":3.362204724409449,"weight":1.183},{"od_mm":90,"od_inch":3.543,"grade":"PE 63","pn":"PN 3.2","min":3.5,"max":4.0,"id_mm":3.395669291338583,"weight":0.974},{"od_mm":90,"od_inch":3.543,"grade":"PE 80","pn":"PN 4","min":3.5,"max":4.0,"id_mm":3.395669291338583,"weight":0.974},{"od_mm":90,"od_inch":3.543,"grade":"PE 100","pn":"PN 5","min":3.5,"max":4.0,"id_mm":3.395669291338583,"weight":0.974},{"od_mm":90,"od_inch":3.543,"grade":"PE 63","pn":"PN 2.5","min":2.8,"max":3.2,"id_mm":3.425196850393701,"weight":0.786},{"od_mm":90,"od_inch":3.543,"grade":"PE 80","pn":"PN 3.2","min":2.8,"max":3.2,"id_mm":3.425196850393701,"weight":0.786},{"od_mm":90,"od_inch":3.543,"grade":"PE 100","pn":"PN 4","min":2.8,"max":3.2,"id_mm":3.425196850393701,"weight":0.786},{"od_mm":90,"od_inch":3.543,"grade":"PE 63","pn":"PN 2","min":2.2,"max":2.6,"id_mm":3.4488188976377954,"weight":0.633},{"od_mm":90,"od_inch":3.543,"grade":"PE 80","pn":"PN 2.5","min":2.2,"max":2.6,"id_mm":3.4488188976377954,"weight":0.633},{"od_mm":90,"od_inch":3.543,"grade":"PE 100","pn":"PN 3.2","min":2.2,"max":2.6,"id_mm":3.4488188976377954,"weight":0.633},{"od_mm":110,"od_inch":4.331,"grade":"PE 80","pn":"PN 20","min":18.4,"max":20.4,"id_mm":3.5669291338582676,"weight":5.295},{"od_mm":110,"od_inch":4.331,"grade":"PE 80","pn":"PN 16","min":14.9,"max":16.5,"id_mm":3.7125984251968505,"weight":4.46},{"od_mm":110,"od_inch":4.331,"grade":"PE 100","pn":"PN 20","min":14.9,"max":16.5,"id_mm":3.7125984251968505,"weight":4.46},{"od_mm":110,"od_inch":4.331,"grade":"PE 80","pn":"PN 12.5","min":12.3,"max":13.7,"id_mm":3.818897637795276,"weight":3.799},{"od_mm":110,"od_inch":4.331,"grade":"PE 100","pn":"PN 16","min":12.3,"max":13.7,"id_mm":3.818897637795276,"weight":3.799},{"od_mm":110,"od_inch":4.331,"grade":"PE 63","pn":"PN 8","min":10.0,"max":11.1,"id_mm":3.9153543307086616,"weight":3.161},{"od_mm":110,"od_inch":4.331,"grade":"PE 80","pn":"PN 10","min":10.0,"max":11.1,"id_mm":3.9153543307086616,"weight":3.161},{"od_mm":110,"od_inch":4.331,"grade":"PE 100","pn":"PN 12.5","min":10.0,"max":11.1,"id_mm":3.9153543307086616,"weight":3.161},{"od_mm":110,"od_inch":4.331,"grade":"PE 63","pn":"PN 6","min":8.1,"max":9.1,"id_mm":3.992125984251969,"weight":2.627},{"od_mm":110,"od_inch":4.331,"grade":"PE 80","pn":"PN 8","min":8.1,"max":9.1,"id_mm":3.992125984251969,"weight":2.627},{"od_mm":110,"od_inch":4.331,"grade":"PE 100","pn":"PN 10","min":8.1,"max":9.1,"id_mm":3.992125984251969,"weight":2.627},{"od_mm":110,"od_inch":4.331,"grade":"PE 63","pn":"PN 5","min":6.5,"max":7.3,"id_mm":4.059055118110236,"weight":2.143},{"od_mm":110,"od_inch":4.331,"grade":"PE 80","pn":"PN 6","min":6.5,"max":7.3,"id_mm":4.059055118110236,"weight":2.143},{"od_mm":110,"od_inch":4.331,"grade":"PE 100","pn":"PN 8","min":6.5,"max":7.3,"id_mm":4.059055118110236,"weight":2.143},{"od_mm":110,"od_inch":4.331,"grade":"PE 63","pn":"PN 4","min":5.3,"max":6.0,"id_mm":4.108267716535433,"weight":1.776},{"od_mm":110,"od_inch":4.331,"grade":"PE 80","pn":"PN 5","min":5.3,"max":6.0,"id_mm":4.108267716535433,"weight":1.776},{"od_mm":110,"od_inch":4.331,"grade":"PE 100","pn":"PN 6","min":5.3,"max":6.0,"id_mm":4.108267716535433,"weight":1.776},{"od_mm":110,"od_inch":4.331,"grade":"PE 63","pn":"PN 3.2","min":4.3,"max":4.9,"id_mm":4.149606299212599,"weight":1.46},{"od_mm":110,"od_inch":4.331,"grade":"PE 80","pn":"PN 4","min":4.3,"max":4.9,"id_mm":4.149606299212599,"weight":1.46},{"od_mm":110,"od_inch":4.331,"grade":"PE 100","pn":"PN 5","min":4.3,"max":4.9,"id_mm":4.149606299212599,"weight":1.46},{"od_mm":110,"od_inch":4.331,"grade":"PE 63","pn":"PN 2.5","min":3.4,"max":3.9,"id_mm":4.187007874015748,"weight":1.169},{"od_mm":110,"od_inch":4.331,"grade":"PE 80","pn":"PN 3.2","min":3.4,"max":3.9,"id_mm":4.187007874015748,"weight":1.169},{"od_mm":110,"od_inch":4.331,"grade":"PE 100","pn":"PN 4","min":3.4,"max":3.9,"id_mm":4.187007874015748,"weight":1.169},{"od_mm":110,"od_inch":4.331,"grade":"PE 63","pn":"PN 2","min":2.7,"max":3.1,"id_mm":4.216535433070866,"weight":0.936},{"od_mm":110,"od_inch":4.331,"grade":"PE 80","pn":"PN 2.5","min":2.7,"max":3.1,"id_mm":4.216535433070866,"weight":0.936},{"od_mm":110,"od_inch":4.331,"grade":"PE 100","pn":"PN 3.2","min":2.7,"max":3.1,"id_mm":4.216535433070866,"weight":0.936},{"od_mm":125,"od_inch":4.921,"grade":"PE 80","pn":"PN 20","min":20.9,"max":23.1,"id_mm":4.05511811023622,"weight":6.827},{"od_mm":125,"od_inch":4.921,"grade":"PE 80","pn":"PN 16","min":16.9,"max":18.7,"id_mm":4.220472440944882,"weight":5.749},{"od_mm":125,"od_inch":4.921,"grade":"PE 100","pn":"PN 20","min":16.9,"max":18.7,"id_mm":4.220472440944882,"weight":5.749},{"od_mm":125,"od_inch":4.921,"grade":"PE 80","pn":"PN 12.5","min":13.9,"max":15.4,"id_mm":4.344488188976378,"weight":4.87},{"od_mm":125,"od_inch":4.921,"grade":"PE 100","pn":"PN 16","min":13.9,"max":15.4,"id_mm":4.344488188976378,"weight":4.87},{"od_mm":125,"od_inch":4.921,"grade":"PE 63","pn":"PN 8","min":11.4,"max":12.7,"id_mm":4.446850393700788,"weight":4.1},{"od_mm":125,"od_inch":4.921,"grade":"PE 80","pn":"PN 10","min":11.4,"max":12.7,"id_mm":4.446850393700788,"weight":4.1},{"od_mm":125,"od_inch":4.921,"grade":"PE 100","pn":"PN 12.5","min":11.4,"max":12.7,"id_mm":4.446850393700788,"weight":4.1},{"od_mm":125,"od_inch":4.921,"grade":"PE 63","pn":"PN 6","min":9.2,"max":10.3,"id_mm":4.53740157480315,"weight":3.385},{"od_mm":125,"od_inch":4.921,"grade":"PE 80","pn":"PN 8","min":9.2,"max":10.3,"id_mm":4.53740157480315,"weight":3.385},{"od_mm":125,"od_inch":4.921,"grade":"PE 100","pn":"PN 10","min":9.2,"max":10.3,"id_mm":4.53740157480315,"weight":3.385},{"od_mm":125,"od_inch":4.921,"grade":"PE 63","pn":"PN 5","min":7.4,"max":8.3,"id_mm":4.612204724409449,"weight":2.77},{"od_mm":125,"od_inch":4.921,"grade":"PE 80","pn":"PN 6","min":7.4,"max":8.3,"id_mm":4.612204724409449,"weight":2.77},{"od_mm":125,"od_inch":4.921,"grade":"PE 100","pn":"PN 8","min":7.4,"max":8.3,"id_mm":4.612204724409449,"weight":2.77},{"od_mm":125,"od_inch":4.921,"grade":"PE 63","pn":"PN 4","min":6.0,"max":6.7,"id_mm":4.671259842519685,"weight":2.27},{"od_mm":125,"od_inch":4.921,"grade":"PE 80","pn":"PN 5","min":6.0,"max":6.7,"id_mm":4.671259842519685,"weight":2.27},{"od_mm":125,"od_inch":4.921,"grade":"PE 100","pn":"PN 6","min":6.0,"max":6.7,"id_mm":4.671259842519685,"weight":2.27},{"od_mm":125,"od_inch":4.921,"grade":"PE 63","pn":"PN 3.2","min":4.9,"max":5.5,"id_mm":4.716535433070867,"weight":1.877},{"od_mm":125,"od_inch":4.921,"grade":"PE 80","pn":"PN 4","min":4.9,"max":5.5,"id_mm":4.716535433070867,"weight":1.877},{"od_mm":125,"od_inch":4.921,"grade":"PE 100","pn":"PN 5","min":4.9,"max":5.5,"id_mm":4.716535433070867,"weight":1.877},{"od_mm":125,"od_inch":4.921,"grade":"PE 63","pn":"PN 2.5","min":3.8,"max":4.3,"id_mm":4.761811023622047,"weight":1.476},{"od_mm":125,"od_inch":4.921,"grade":"PE 80","pn":"PN 3.2","min":3.8,"max":4.3,"id_mm":4.761811023622047,"weight":1.476},{"od_mm":125,"od_inch":4.921,"grade":"PE 100","pn":"PN 4","min":3.8,"max":4.3,"id_mm":4.761811023622047,"weight":1.476},{"od_mm":125,"od_inch":4.921,"grade":"PE 63","pn":"PN 2","min":3.1,"max":3.6,"id_mm":4.789370078740158,"weight":1.227},{"od_mm":125,"od_inch":4.921,"grade":"PE 80","pn":"PN 2.5","min":3.1,"max":3.6,"id_mm":4.789370078740158,"weight":1.227},{"od_mm":125,"od_inch":4.921,"grade":"PE 100","pn":"PN 3.2","min":3.1,"max":3.6,"id_mm":4.789370078740158,"weight":1.227},{"od_mm":140,"od_inch":5.512,"grade":"PE 80","pn":"PN 20","min":23.4,"max":25.9,"id_mm":4.541338582677166,"weight":8.567},{"od_mm":140,"od_inch":5.512,"grade":"PE 80","pn":"PN 16","min":19.0,"max":21.0,"id_mm":4.724409448818898,"weight":7.231},{"od_mm":140,"od_inch":5.512,"grade":"PE 100","pn":"PN 20","min":19.0,"max":21.0,"id_mm":4.724409448818898,"weight":7.231},{"od_mm":140,"od_inch":5.512,"grade":"PE 80","pn":"PN 12.5","min":15.6,"max":17.3,"id_mm":4.8641732283464565,"weight":6.123},{"od_mm":140,"od_inch":5.512,"grade":"PE 100","pn":"PN 16","min":15.6,"max":17.3,"id_mm":4.8641732283464565,"weight":6.123},{"od_mm":140,"od_inch":5.512,"grade":"PE 63","pn":"PN 8","min":12.8,"max":14.2,"id_mm":4.980314960629921,"weight":5.145},{"od_mm":140,"od_inch":5.512,"grade":"PE 80","pn":"PN 10","min":12.8,"max":14.2,"id_mm":4.980314960629921,"weight":5.145},{"od_mm":140,"od_inch":5.512,"grade":"PE 100","pn":"PN 12.5","min":12.8,"max":14.2,"id_mm":4.980314960629921,"weight":5.145},{"od_mm":140,"od_inch":5.512,"grade":"PE 63","pn":"PN 6","min":10.3,"max":11.5,"id_mm":5.082677165354331,"weight":4.239},{"od_mm":140,"od_inch":5.512,"grade":"PE 80","pn":"PN 8","min":10.3,"max":11.5,"id_mm":5.082677165354331,"weight":4.239},{"od_mm":140,"od_inch":5.512,"grade":"PE 100","pn":"PN 10","min":10.3,"max":11.5,"id_mm":5.082677165354331,"weight":4.239},{"od_mm":140,"od_inch":5.512,"grade":"PE 63","pn":"PN 5","min":8.3,"max":9.3,"id_mm":5.165354330708661,"weight":3.478},{"od_mm":140,"od_inch":5.512,"grade":"PE 80","pn":"PN 6","min":8.3,"max":9.3,"id_mm":5.165354330708661,"weight":3.478},{"od_mm":140,"od_inch":5.512,"grade":"PE 100","pn":"PN 8","min":8.3,"max":9.3,"id_mm":5.165354330708661,"weight":3.478},{"od_mm":140,"od_inch":5.512,"grade":"PE 63","pn":"PN 4","min":6.7,"max":7.5,"id_mm":5.23228346456693,"weight":2.843},{"od_mm":140,"od_inch":5.512,"grade":"PE 80","pn":"PN 5","min":6.7,"max":7.5,"id_mm":5.23228346456693,"weight":2.843},{"od_mm":140,"od_inch":5.512,"grade":"PE 100","pn":"PN 6","min":6.7,"max":7.5,"id_mm":5.23228346456693,"weight":2.843},{"od_mm":140,"od_inch":5.512,"grade":"PE 63","pn":"PN 3.2","min":5.4,"max":6.1,"id_mm":5.285433070866142,"weight":2.325},{"od_mm":140,"od_inch":5.512,"grade":"PE 80","pn":"PN 4","min":5.4,"max":6.1,"id_mm":5.285433070866142,"weight":2.325},{"od_mm":140,"od_inch":5.512,"grade":"PE 100","pn":"PN 5","min":5.4,"max":6.1,"id_mm":5.285433070866142,"weight":2.325},{"od_mm":140,"od_inch":5.512,"grade":"PE 63","pn":"PN 2.5","min":4.3,"max":4.9,"id_mm":5.330708661417323,"weight":1.876},{"od_mm":140,"od_inch":5.512,"grade":"PE 80","pn":"PN 3.2","min":4.3,"max":4.9,"id_mm":5.330708661417323,"weight":1.876},{"od_mm":140,"od_inch":5.512,"grade":"PE 100","pn":"PN 4","min":4.3,"max":4.9,"id_mm":5.330708661417323,"weight":1.876},{"od_mm":140,"od_inch":5.512,"grade":"PE 63","pn":"PN 2","min":3.5,"max":4.0,"id_mm":5.364173228346457,"weight":1.539},{"od_mm":140,"od_inch":5.512,"grade":"PE 80","pn":"PN 2.5","min":3.5,"max":4.0,"id_mm":5.364173228346457,"weight":1.539},{"od_mm":140,"od_inch":5.512,"grade":"PE 100","pn":"PN 3.2","min":3.5,"max":4.0,"id_mm":5.364173228346457,"weight":1.539},{"od_mm":160,"od_inch":6.299,"grade":"PE 80","pn":"PN 20","min":26.7,"max":29.5,"id_mm":5.192913385826772,"weight":11.166},{"od_mm":160,"od_inch":6.299,"grade":"PE 80","pn":"PN 16","min":21.7,"max":24.0,"id_mm":5.399606299212599,"weight":9.441},{"od_mm":160,"od_inch":6.299,"grade":"PE 100","pn":"PN 20","min":21.7,"max":24.0,"id_mm":5.399606299212599,"weight":9.441},{"od_mm":160,"od_inch":6.299,"grade":"PE 80","pn":"PN 12.5","min":17.8,"max":19.7,"id_mm":5.561023622047244,"weight":7.978},{"od_mm":160,"od_inch":6.299,"grade":"PE 100","pn":"PN 16","min":17.8,"max":19.7,"id_mm":5.561023622047244,"weight":7.978},{"od_mm":160,"od_inch":6.299,"grade":"PE 63","pn":"PN 8","min":14.6,"max":16.2,"id_mm":5.692913385826771,"weight":6.708},{"od_mm":160,"od_inch":6.299,"grade":"PE 80","pn":"PN 10","min":14.6,"max":16.2,"id_mm":5.692913385826771,"weight":6.708},{"od_mm":160,"od_inch":6.299,"grade":"PE 100","pn":"PN 12.5","min":14.6,"max":16.2,"id_mm":5.692913385826771,"weight":6.708},{"od_mm":160,"od_inch":6.299,"grade":"PE 63","pn":"PN 6","min":11.8,"max":13.1,"id_mm":5.809055118110237,"weight":5.534},{"od_mm":160,"od_inch":6.299,"grade":"PE 80","pn":"PN 8","min":11.8,"max":13.1,"id_mm":5.809055118110237,"weight":5.534},{"od_mm":160,"od_inch":6.299,"grade":"PE 100","pn":"PN 10","min":11.8,"max":13.1,"id_mm":5.809055118110237,"weight":5.534},{"od_mm":160,"od_inch":6.299,"grade":"PE 63","pn":"PN 5","min":9.5,"max":10.6,"id_mm":5.903543307086614,"weight":4.539},{"od_mm":160,"od_inch":6.299,"grade":"PE 80","pn":"PN 6","min":9.5,"max":10.6,"id_mm":5.903543307086614,"weight":4.539},{"od_mm":160,"od_inch":6.299,"grade":"PE 100","pn":"PN 8","min":9.5,"max":10.6,"id_mm":5.903543307086614,"weight":4.539},{"od_mm":160,"od_inch":6.299,"grade":"PE 63","pn":"PN 4","min":7.7,"max":8.6,"id_mm":5.978346456692914,"weight":3.728},{"od_mm":160,"od_inch":6.299,"grade":"PE 80","pn":"PN 5","min":7.7,"max":8.6,"id_mm":5.978346456692914,"weight":3.728},{"od_mm":160,"od_inch":6.299,"grade":"PE 100","pn":"PN 6","min":7.7,"max":8.6,"id_mm":5.978346456692914,"weight":3.728},{"od_mm":160,"od_inch":6.299,"grade":"PE 63","pn":"PN 3.2","min":6.2,"max":7.0,"id_mm":6.039370078740158,"weight":3.05},{"od_mm":160,"od_inch":6.299,"grade":"PE 80","pn":"PN 4","min":6.2,"max":7.0,"id_mm":6.039370078740158,"weight":3.05},{"od_mm":160,"od_inch":6.299,"grade":"PE 100","pn":"PN 5","min":6.2,"max":7.0,"id_mm":6.039370078740158,"weight":3.05},{"od_mm":160,"od_inch":6.299,"grade":"PE 63","pn":"PN 2.5","min":4.9,"max":5.5,"id_mm":6.094488188976379,"weight":2.425},{"od_mm":160,"od_inch":6.299,"grade":"PE 80","pn":"PN 3.2","min":4.9,"max":5.5,"id_mm":6.094488188976379,"weight":2.425},{"od_mm":160,"od_inch":6.299,"grade":"PE 100","pn":"PN 4","min":4.9,"max":5.5,"id_mm":6.094488188976379,"weight":2.425},{"od_mm":160,"od_inch":6.299,"grade":"PE 63","pn":"PN 2","min":4.0,"max":4.5,"id_mm":6.131889763779528,"weight":1.994},{"od_mm":160,"od_inch":6.299,"grade":"PE 80","pn":"PN 2.5","min":4.0,"max":4.5,"id_mm":6.131889763779528,"weight":1.994},{"od_mm":160,"od_inch":6.299,"grade":"PE 100","pn":"PN 3.2","min":4.0,"max":4.5,"id_mm":6.131889763779528,"weight":1.994},{"od_mm":180,"od_inch":7.087,"grade":"PE 80","pn":"PN 20","min":30.0,"max":33.1,"id_mm":5.844488188976378,"weight":14.109},{"od_mm":180,"od_inch":7.087,"grade":"PE 80","pn":"PN 16","min":24.4,"max":27.0,"id_mm":6.0748031496063,"weight":11.945},{"od_mm":180,"od_inch":7.087,"grade":"PE 100","pn":"PN 20","min":24.4,"max":27.0,"id_mm":6.0748031496063,"weight":11.945},{"od_mm":180,"od_inch":7.087,"grade":"PE 80","pn":"PN 12.5","min":20.0,"max":22.1,"id_mm":6.2578740157480315,"weight":10.079},{"od_mm":180,"od_inch":7.087,"grade":"PE 100","pn":"PN 16","min":20.0,"max":22.1,"id_mm":6.2578740157480315,"weight":10.079},{"od_mm":180,"od_inch":7.087,"grade":"PE 63","pn":"PN 8","min":16.4,"max":18.2,"id_mm":6.405511811023622,"weight":8.478},{"od_mm":180,"od_inch":7.087,"grade":"PE 80","pn":"PN 10","min":16.4,"max":18.2,"id_mm":6.405511811023622,"weight":8.478},{"od_mm":180,"od_inch":7.087,"grade":"PE 100","pn":"PN 12.5","min":16.4,"max":18.2,"id_mm":6.405511811023622,"weight":8.478},{"od_mm":180,"od_inch":7.087,"grade":"PE 63","pn":"PN 6","min":13.3,"max":14.8,"id_mm":6.533464566929133,"weight":7.023},{"od_mm":180,"od_inch":7.087,"grade":"PE 80","pn":"PN 8","min":13.3,"max":14.8,"id_mm":6.533464566929133,"weight":7.023},{"od_mm":180,"od_inch":7.087,"grade":"PE 100","pn":"PN 10","min":13.3,"max":14.8,"id_mm":6.533464566929133,"weight":7.023},{"od_mm":180,"od_inch":7.087,"grade":"PE 63","pn":"PN 5","min":10.6,"max":11.8,"id_mm":6.645669291338583,"weight":5.694},{"od_mm":180,"od_inch":7.087,"grade":"PE 80","pn":"PN 6","min":10.6,"max":11.8,"id_mm":6.645669291338583,"weight":5.694},{"od_mm":180,"od_inch":7.087,"grade":"PE 100","pn":"PN 8","min":10.6,"max":11.8,"id_mm":6.645669291338583,"weight":5.694},{"od_mm":180,"od_inch":7.087,"grade":"PE 63","pn":"PN 4","min":8.6,"max":9.6,"id_mm":6.728346456692914,"weight":4.684},{"od_mm":180,"od_inch":7.087,"grade":"PE 80","pn":"PN 5","min":8.6,"max":9.6,"id_mm":6.728346456692914,"weight":4.684},{"od_mm":180,"od_inch":7.087,"grade":"PE 100","pn":"PN 6","min":8.6,"max":9.6,"id_mm":6.728346456692914,"weight":4.684},{"od_mm":180,"od_inch":7.087,"grade":"PE 63","pn":"PN 3.2","min":7.0,"max":7.8,"id_mm":6.7952755905511815,"weight":3.847},{"od_mm":180,"od_inch":7.087,"grade":"PE 80","pn":"PN 4","min":7.0,"max":7.8,"id_mm":6.7952755905511815,"weight":3.847},{"od_mm":180,"od_inch":7.087,"grade":"PE 100","pn":"PN 5","min":7.0,"max":7.8,"id_mm":6.7952755905511815,"weight":3.847},{"od_mm":180,"od_inch":7.087,"grade":"PE 63","pn":"PN 2.5","min":5.5,"max":6.2,"id_mm":6.856299212598426,"weight":3.068},{"od_mm":180,"od_inch":7.087,"grade":"PE 80","pn":"PN 3.2","min":5.5,"max":6.2,"id_mm":6.856299212598426,"weight":3.068},{"od_mm":180,"od_inch":7.087,"grade":"PE 100","pn":"PN 4","min":5.5,"max":6.2,"id_mm":6.856299212598426,"weight":3.068},{"od_mm":180,"od_inch":7.087,"grade":"PE 63","pn":"PN 2","min":4.4,"max":5.0,"id_mm":6.901574803149607,"weight":2.482},{"od_mm":180,"od_inch":7.087,"grade":"PE 80","pn":"PN 2.5","min":4.4,"max":5.0,"id_mm":6.901574803149607,"weight":2.482},{"od_mm":180,"od_inch":7.087,"grade":"PE 100","pn":"PN 3.2","min":4.4,"max":5.0,"id_mm":6.901574803149607,"weight":2.482},{"od_mm":200,"od_inch":7.874,"grade":"PE 80","pn":"PN 20","min":33.4,"max":36.9,"id_mm":6.490157480314961,"weight":17.454},{"od_mm":200,"od_inch":7.874,"grade":"PE 80","pn":"PN 16","min":27.1,"max":30.0,"id_mm":6.75,"weight":14.744},{"od_mm":200,"od_inch":7.874,"grade":"PE 100","pn":"PN 20","min":27.1,"max":30.0,"id_mm":6.75,"weight":14.744},{"od_mm":200,"od_inch":7.874,"grade":"PE 80","pn":"PN 12.5","min":22.3,"max":24.7,"id_mm":6.948818897637795,"weight":12.493},{"od_mm":200,"od_inch":7.874,"grade":"PE 100","pn":"PN 16","min":22.3,"max":24.7,"id_mm":6.948818897637795,"weight":12.493},{"od_mm":200,"od_inch":7.874,"grade":"PE 63","pn":"PN 8","min":18.2,"max":20.2,"id_mm":7.118110236220473,"weight":10.456},{"od_mm":200,"od_inch":7.874,"grade":"PE 80","pn":"PN 10","min":18.2,"max":20.2,"id_mm":7.118110236220473,"weight":10.456},{"od_mm":200,"od_inch":7.874,"grade":"PE 100","pn":"PN 12.5","min":18.2,"max":20.2,"id_mm":7.118110236220473,"weight":10.456},{"od_mm":200,"od_inch":7.874,"grade":"PE 63","pn":"PN 6","min":14.8,"max":16.4,"id_mm":7.25984251968504,"weight":8.664},{"od_mm":200,"od_inch":7.874,"grade":"PE 80","pn":"PN 8","min":14.8,"max":16.4,"id_mm":7.25984251968504,"weight":8.664},{"od_mm":200,"od_inch":7.874,"grade":"PE 100","pn":"PN 10","min":14.8,"max":16.4,"id_mm":7.25984251968504,"weight":8.664},{"od_mm":200,"od_inch":7.874,"grade":"PE 63","pn":"PN 5","min":11.8,"max":13.1,"id_mm":7.383858267716536,"weight":7.033},{"od_mm":200,"od_inch":7.874,"grade":"PE 80","pn":"PN 6","min":11.8,"max":13.1,"id_mm":7.383858267716536,"weight":7.033},{"od_mm":200,"od_inch":7.874,"grade":"PE 100","pn":"PN 8","min":11.8,"max":13.1,"id_mm":7.383858267716536,"weight":7.033},{"od_mm":200,"od_inch":7.874,"grade":"PE 63","pn":"PN 4","min":9.6,"max":10.7,"id_mm":7.474409448818898,"weight":5.804},{"od_mm":200,"od_inch":7.874,"grade":"PE 80","pn":"PN 5","min":9.6,"max":10.7,"id_mm":7.474409448818898,"weight":5.804},{"od_mm":200,"od_inch":7.874,"grade":"PE 100","pn":"PN 6","min":9.6,"max":10.7,"id_mm":7.474409448818898,"weight":5.804},{"od_mm":200,"od_inch":7.874,"grade":"PE 63","pn":"PN 3.2","min":7.7,"max":8.6,"id_mm":7.553149606299213,"weight":4.709},{"od_mm":200,"od_inch":7.874,"grade":"PE 80","pn":"PN 4","min":7.7,"max":8.6,"id_mm":7.553149606299213,"weight":4.709},{"od_mm":200,"od_inch":7.874,"grade":"PE 100","pn":"PN 5","min":7.7,"max":8.6,"id_mm":7.553149606299213,"weight":4.709},{"od_mm":200,"od_inch":7.874,"grade":"PE 63","pn":"PN 2.5","min":6.1,"max":6.9,"id_mm":7.618110236220473,"weight":3.788},{"od_mm":200,"od_inch":7.874,"grade":"PE 80","pn":"PN 3.2","min":6.1,"max":6.9,"id_mm":7.618110236220473,"weight":3.788},{"od_mm":200,"od_inch":7.874,"grade":"PE 100","pn":"PN 4","min":6.1,"max":6.9,"id_mm":7.618110236220473,"weight":3.788},{"od_mm":200,"od_inch":7.874,"grade":"PE 63","pn":"PN 2","min":4.9,"max":5.5,"id_mm":7.669291338582678,"weight":3.051},{"od_mm":200,"od_inch":7.874,"grade":"PE 80","pn":"PN 2.5","min":4.9,"max":5.5,"id_mm":7.669291338582678,"weight":3.051},{"od_mm":200,"od_inch":7.874,"grade":"PE 100","pn":"PN 3.2","min":4.9,"max":5.5,"id_mm":7.669291338582678,"weight":3.051},{"od_mm":225,"od_inch":8.858,"grade":"PE 80","pn":"PN 20","min":37.5,"max":41.4,"id_mm":7.305118110236221,"weight":22.052},{"od_mm":225,"od_inch":8.858,"grade":"PE 80","pn":"PN 16","min":30.5,"max":33.7,"id_mm":7.594488188976379,"weight":18.654},{"od_mm":225,"od_inch":8.858,"grade":"PE 100","pn":"PN 20","min":30.5,"max":33.7,"id_mm":7.594488188976379,"weight":18.654},{"od_mm":225,"od_inch":8.858,"grade":"PE 80","pn":"PN 12.5","min":25.0,"max":27.6,"id_mm":7.822834645669292,"weight":15.743},{"od_mm":225,"od_inch":8.858,"grade":"PE 100","pn":"PN 16","min":25.0,"max":27.6,"id_mm":7.822834645669292,"weight":15.743},{"od_mm":225,"od_inch":8.858,"grade":"PE 63","pn":"PN 8","min":20.5,"max":22.7,"id_mm":8.007874015748031,"weight":13.235},{"od_mm":225,"od_inch":8.858,"grade":"PE 80","pn":"PN 10","min":20.5,"max":22.7,"id_mm":8.007874015748031,"weight":13.235},{"od_mm":225,"od_inch":8.858,"grade":"PE 100","pn":"PN 12.5","min":20.5,"max":22.7,"id_mm":8.007874015748031,"weight":13.235},{"od_mm":225,"od_inch":8.858,"grade":"PE 63","pn":"PN 6","min":16.6,"max":18.4,"id_mm":8.169291338582678,"weight":10.938},{"od_mm":225,"od_inch":8.858,"grade":"PE 80","pn":"PN 8","min":16.6,"max":18.4,"id_mm":8.169291338582678,"weight":10.938},{"od_mm":225,"od_inch":8.858,"grade":"PE 100","pn":"PN 10","min":16.6,"max":18.4,"id_mm":8.169291338582678,"weight":10.938},{"od_mm":225,"od_inch":8.858,"grade":"PE 63","pn":"PN 5","min":13.3,"max":14.8,"id_mm":8.30511811023622,"weight":8.928},{"od_mm":225,"od_inch":8.858,"grade":"PE 80","pn":"PN 6","min":13.3,"max":14.8,"id_mm":8.30511811023622,"weight":8.928},{"od_mm":225,"od_inch":8.858,"grade":"PE 100","pn":"PN 8","min":13.3,"max":14.8,"id_mm":8.30511811023622,"weight":8.928},{"od_mm":225,"od_inch":8.858,"grade":"PE 63","pn":"PN 4","min":10.8,"max":12.0,"id_mm":8.409448818897639,"weight":7.335},{"od_mm":225,"od_inch":8.858,"grade":"PE 80","pn":"PN 5","min":10.8,"max":12.0,"id_mm":8.409448818897639,"weight":7.335},{"od_mm":225,"od_inch":8.858,"grade":"PE 100","pn":"PN 6","min":10.8,"max":12.0,"id_mm":8.409448818897639,"weight":7.335},{"od_mm":225,"od_inch":8.858,"grade":"PE 63","pn":"PN 3.2","min":8.7,"max":9.7,"id_mm":8.496062992125985,"weight":5.98},{"od_mm":225,"od_inch":8.858,"grade":"PE 80","pn":"PN 4","min":8.7,"max":9.7,"id_mm":8.496062992125985,"weight":5.98},{"od_mm":225,"od_inch":8.858,"grade":"PE 100","pn":"PN 5","min":8.7,"max":9.7,"id_mm":8.496062992125985,"weight":5.98},{"od_mm":225,"od_inch":8.858,"grade":"PE 63","pn":"PN 2.5","min":6.9,"max":7.7,"id_mm":8.570866141732283,"weight":4.787},{"od_mm":225,"od_inch":8.858,"grade":"PE 80","pn":"PN 3.2","min":6.9,"max":7.7,"id_mm":8.570866141732283,"weight":4.787},{"od_mm":225,"od_inch":8.858,"grade":"PE 100","pn":"PN 4","min":6.9,"max":7.7,"id_mm":8.570866141732283,"weight":4.787},{"od_mm":225,"od_inch":8.858,"grade":"PE 63","pn":"PN 2","min":5.5,"max":6.2,"id_mm":8.627952755905513,"weight":3.862},{"od_mm":225,"od_inch":8.858,"grade":"PE 80","pn":"PN 2.5","min":5.5,"max":6.2,"id_mm":8.627952755905513,"weight":3.862},{"od_mm":225,"od_inch":8.858,"grade":"PE 100","pn":"PN 3.2","min":5.5,"max":6.2,"id_mm":8.627952755905513,"weight":3.862},{"od_mm":250,"od_inch":9.843,"grade":"PE 80","pn":"PN 20","min":41.7,"max":46.0,"id_mm":8.116141732283465,"weight":27.23},{"od_mm":250,"od_inch":9.843,"grade":"PE 80","pn":"PN 16","min":33.8,"max":37.3,"id_mm":8.442913385826772,"weight":22.964},{"od_mm":250,"od_inch":9.843,"grade":"PE 100","pn":"PN 20","min":33.8,"max":37.3,"id_mm":8.442913385826772,"weight":22.964},{"od_mm":250,"od_inch":9.843,"grade":"PE 80","pn":"PN 12.5","min":27.8,"max":30.7,"id_mm":8.690944881889765,"weight":19.449},{"od_mm":250,"od_inch":9.843,"grade":"PE 100","pn":"PN 16","min":27.8,"max":30.7,"id_mm":8.690944881889765,"weight":19.449},{"od_mm":250,"od_inch":9.843,"grade":"PE 63","pn":"PN 8","min":22.8,"max":25.2,"id_mm":8.89763779527559,"weight":16.337},{"od_mm":250,"od_inch":9.843,"grade":"PE 80","pn":"PN 10","min":22.8,"max":25.2,"id_mm":8.89763779527559,"weight":16.337},{"od_mm":250,"od_inch":9.843,"grade":"PE 100","pn":"PN 12.5","min":22.8,"max":25.2,"id_mm":8.89763779527559,"weight":16.337},{"od_mm":250,"od_inch":9.843,"grade":"PE 63","pn":"PN 6","min":18.4,"max":20.4,"id_mm":9.078740157480315,"weight":13.474},{"od_mm":250,"od_inch":9.843,"grade":"PE 80","pn":"PN 8","min":18.4,"max":20.4,"id_mm":9.078740157480315,"weight":13.474},{"od_mm":250,"od_inch":9.843,"grade":"PE 100","pn":"PN 10","min":18.4,"max":20.4,"id_mm":9.078740157480315,"weight":13.474},{"od_mm":250,"od_inch":9.843,"grade":"PE 63","pn":"PN 5","min":14.8,"max":16.4,"id_mm":9.228346456692915,"weight":11.014},{"od_mm":250,"od_inch":9.843,"grade":"PE 80","pn":"PN 6","min":14.8,"max":16.4,"id_mm":9.228346456692915,"weight":11.014},{"od_mm":250,"od_inch":9.843,"grade":"PE 100","pn":"PN 8","min":14.8,"max":16.4,"id_mm":9.228346456692915,"weight":11.014},{"od_mm":250,"od_inch":9.843,"grade":"PE 63","pn":"PN 4","min":12.0,"max":13.3,"id_mm":9.344488188976378,"weight":9.043},{"od_mm":250,"od_inch":9.843,"grade":"PE 80","pn":"PN 5","min":12.0,"max":13.3,"id_mm":9.344488188976378,"weight":9.043},{"od_mm":250,"od_inch":9.843,"grade":"PE 100","pn":"PN 6","min":12.0,"max":13.3,"id_mm":9.344488188976378,"weight":9.043},{"od_mm":250,"od_inch":9.843,"grade":"PE 63","pn":"PN 3.2","min":9.7,"max":10.8,"id_mm":9.438976377952756,"weight":7.402},{"od_mm":250,"od_inch":9.843,"grade":"PE 80","pn":"PN 4","min":9.7,"max":10.8,"id_mm":9.438976377952756,"weight":7.402},{"od_mm":250,"od_inch":9.843,"grade":"PE 100","pn":"PN 5","min":9.7,"max":10.8,"id_mm":9.438976377952756,"weight":7.402},{"od_mm":250,"od_inch":9.843,"grade":"PE 63","pn":"PN 2.5","min":7.6,"max":8.5,"id_mm":9.525590551181102,"weight":5.866},{"od_mm":250,"od_inch":9.843,"grade":"PE 80","pn":"PN 3.2","min":7.6,"max":8.5,"id_mm":9.525590551181102,"weight":5.866},{"od_mm":250,"od_inch":9.843,"grade":"PE 100","pn":"PN 4","min":7.6,"max":8.5,"id_mm":9.525590551181102,"weight":5.866},{"od_mm":250,"od_inch":9.843,"grade":"PE 63","pn":"PN 2","min":6.1,"max":6.9,"id_mm":9.586614173228346,"weight":4.767},{"od_mm":250,"od_inch":9.843,"grade":"PE 80","pn":"PN 2.5","min":6.1,"max":6.9,"id_mm":9.586614173228346,"weight":4.767},{"od_mm":250,"od_inch":9.843,"grade":"PE 100","pn":"PN 3.2","min":6.1,"max":6.9,"id_mm":9.586614173228346,"weight":4.767},{"od_mm":280,"od_inch":11.024,"grade":"PE 80","pn":"PN 20","min":46.7,"max":51.5,"id_mm":9.090551181102363,"weight":34.152},{"od_mm":280,"od_inch":11.024,"grade":"PE 80","pn":"PN 16","min":37.9,"max":41.8,"id_mm":9.45472440944882,"weight":28.828},{"od_mm":280,"od_inch":11.024,"grade":"PE 100","pn":"PN 20","min":37.9,"max":41.8,"id_mm":9.45472440944882,"weight":28.828},{"od_mm":280,"od_inch":11.024,"grade":"PE 80","pn":"PN 12.5","min":31.2,"max":34.5,"id_mm":9.730314960629922,"weight":24.455},{"od_mm":280,"od_inch":11.024,"grade":"PE 100","pn":"PN 16","min":31.2,"max":34.5,"id_mm":9.730314960629922,"weight":24.455},{"od_mm":280,"od_inch":11.024,"grade":"PE 63","pn":"PN 8","min":25.5,"max":28.2,"id_mm":9.966535433070867,"weight":20.474},{"od_mm":280,"od_inch":11.024,"grade":"PE 80","pn":"PN 10","min":25.5,"max":28.2,"id_mm":9.966535433070867,"weight":20.474},{"od_mm":280,"od_inch":11.024,"grade":"PE 100","pn":"PN 12.5","min":25.5,"max":28.2,"id_mm":9.966535433070867,"weight":20.474},{"od_mm":280,"od_inch":11.024,"grade":"PE 63","pn":"PN 6","min":20.6,"max":22.8,"id_mm":10.169291338582678,"weight":16.883},{"od_mm":280,"od_inch":11.024,"grade":"PE 80","pn":"PN 8","min":20.6,"max":22.8,"id_mm":10.169291338582678,"weight":16.883},{"od_mm":280,"od_inch":11.024,"grade":"PE 100","pn":"PN 10","min":20.6,"max":22.8,"id_mm":10.169291338582678,"weight":16.883},{"od_mm":280,"od_inch":11.024,"grade":"PE 63","pn":"PN 5","min":16.5,"max":18.3,"id_mm":10.338582677165356,"weight":13.763},{"od_mm":280,"od_inch":11.024,"grade":"PE 80","pn":"PN 6","min":16.5,"max":18.3,"id_mm":10.338582677165356,"weight":13.763},{"od_mm":280,"od_inch":11.024,"grade":"PE 100","pn":"PN 8","min":16.5,"max":18.3,"id_mm":10.338582677165356,"weight":13.763},{"od_mm":280,"od_inch":11.024,"grade":"PE 63","pn":"PN 4","min":13.4,"max":14.9,"id_mm":10.466535433070868,"weight":11.331},{"od_mm":280,"od_inch":11.024,"grade":"PE 80","pn":"PN 5","min":13.4,"max":14.9,"id_mm":10.466535433070868,"weight":11.331},{"od_mm":280,"od_inch":11.024,"grade":"PE 100","pn":"PN 6","min":13.4,"max":14.9,"id_mm":10.466535433070868,"weight":11.331},{"od_mm":280,"od_inch":11.024,"grade":"PE 63","pn":"PN 3.2","min":10.8,"max":12.0,"id_mm":10.5748031496063,"weight":9.223},{"od_mm":280,"od_inch":11.024,"grade":"PE 80","pn":"PN 4","min":10.8,"max":12.0,"id_mm":10.5748031496063,"weight":9.223},{"od_mm":280,"od_inch":11.024,"grade":"PE 100","pn":"PN 5","min":10.8,"max":12.0,"id_mm":10.5748031496063,"weight":9.223},{"od_mm":280,"od_inch":11.024,"grade":"PE 63","pn":"PN 2.5","min":8.5,"max":9.5,"id_mm":10.669291338582678,"weight":7.346},{"od_mm":280,"od_inch":11.024,"grade":"PE 80","pn":"PN 3.2","min":8.5,"max":9.5,"id_mm":10.669291338582678,"weight":7.346},{"od_mm":280,"od_inch":11.024,"grade":"PE 100","pn":"PN 4","min":8.5,"max":9.5,"id_mm":10.669291338582678,"weight":7.346},{"od_mm":280,"od_inch":11.024,"grade":"PE 63","pn":"PN 2","min":6.9,"max":7.7,"id_mm":10.736220472440944,"weight":5.996},{"od_mm":280,"od_inch":11.024,"grade":"PE 80","pn":"PN 2.5","min":6.9,"max":7.7,"id_mm":10.736220472440944,"weight":5.996},{"od_mm":280,"od_inch":11.024,"grade":"PE 100","pn":"PN 3.2","min":6.9,"max":7.7,"id_mm":10.736220472440944,"weight":5.996},{"od_mm":315,"od_inch":12.402,"grade":"PE 80","pn":"PN 20","min":52.5,"max":57.9,"id_mm":10.228346456692915,"weight":43.199},{"od_mm":315,"od_inch":12.402,"grade":"PE 80","pn":"PN 16","min":42.6,"max":47.0,"id_mm":10.637795275590552,"weight":36.463},{"od_mm":315,"od_inch":12.402,"grade":"PE 100","pn":"PN 20","min":42.6,"max":47.0,"id_mm":10.637795275590552,"weight":36.463},{"od_mm":315,"od_inch":12.402,"grade":"PE 80","pn":"PN 12.5","min":35.0,"max":38.6,"id_mm":10.952755905511811,"weight":30.838},{"od_mm":315,"od_inch":12.402,"grade":"PE 100","pn":"PN 16","min":35.0,"max":38.6,"id_mm":10.952755905511811,"weight":30.838},{"od_mm":315,"od_inch":12.402,"grade":"PE 63","pn":"PN 8","min":28.7,"max":31.7,"id_mm":11.212598425196852,"weight":25.907},{"od_mm":315,"od_inch":12.402,"grade":"PE 80","pn":"PN 10","min":28.7,"max":31.7,"id_mm":11.212598425196852,"weight":25.907},{"od_mm":315,"od_inch":12.402,"grade":"PE 100","pn":"PN 12.5","min":28.7,"max":31.7,"id_mm":11.212598425196852,"weight":25.907},{"od_mm":315,"od_inch":12.402,"grade":"PE 63","pn":"PN 6","min":23.2,"max":25.7,"id_mm":11.438976377952757,"weight":21.397},{"od_mm":315,"od_inch":12.402,"grade":"PE 80","pn":"PN 8","min":23.2,"max":25.7,"id_mm":11.438976377952757,"weight":21.397},{"od_mm":315,"od_inch":12.402,"grade":"PE 100","pn":"PN 10","min":23.2,"max":25.7,"id_mm":11.438976377952757,"weight":21.397},{"od_mm":315,"od_inch":12.402,"grade":"PE 63","pn":"PN 5","min":18.6,"max":20.6,"id_mm":11.629921259842519,"weight":17.439},{"od_mm":315,"od_inch":12.402,"grade":"PE 80","pn":"PN 6","min":18.6,"max":20.6,"id_mm":11.629921259842519,"weight":17.439},{"od_mm":315,"od_inch":12.402,"grade":"PE 100","pn":"PN 8","min":18.6,"max":20.6,"id_mm":11.629921259842519,"weight":17.439},{"od_mm":315,"od_inch":12.402,"grade":"PE 63","pn":"PN 4","min":15.0,"max":16.6,"id_mm":11.779527559055119,"weight":14.239},{"od_mm":315,"od_inch":12.402,"grade":"PE 80","pn":"PN 5","min":15.0,"max":16.6,"id_mm":11.779527559055119,"weight":14.239},{"od_mm":315,"od_inch":12.402,"grade":"PE 100","pn":"PN 6","min":15.0,"max":16.6,"id_mm":11.779527559055119,"weight":14.239},{"od_mm":315,"od_inch":12.402,"grade":"PE 63","pn":"PN 3.2","min":12.2,"max":13.6,"id_mm":11.893700787401576,"weight":11.738},{"od_mm":315,"od_inch":12.402,"grade":"PE 80","pn":"PN 4","min":12.2,"max":13.6,"id_mm":11.893700787401576,"weight":11.738},{"od_mm":315,"od_inch":12.402,"grade":"PE 100","pn":"PN 5","min":12.2,"max":13.6,"id_mm":11.893700787401576,"weight":11.738},{"od_mm":315,"od_inch":12.402,"grade":"PE 63","pn":"PN 2.5","min":9.6,"max":10.7,"id_mm":12.00196850393701,"weight":9.32},{"od_mm":315,"od_inch":12.402,"grade":"PE 80","pn":"PN 3.2","min":9.6,"max":10.7,"id_mm":12.00196850393701,"weight":9.32},{"od_mm":315,"od_inch":12.402,"grade":"PE 100","pn":"PN 4","min":9.6,"max":10.7,"id_mm":12.00196850393701,"weight":9.32},{"od_mm":315,"od_inch":12.402,"grade":"PE 63","pn":"PN 2","min":7.7,"max":8.6,"id_mm":12.080708661417324,"weight":7.532},{"od_mm":315,"od_inch":12.402,"grade":"PE 80","pn":"PN 2.5","min":7.7,"max":8.6,"id_mm":12.080708661417324,"weight":7.532},{"od_mm":315,"od_inch":12.402,"grade":"PE 100","pn":"PN 3.2","min":7.7,"max":8.6,"id_mm":12.080708661417324,"weight":7.532},{"od_mm":355,"od_inch":13.976,"grade":"PE 80","pn":"PN 20","min":59.2,"max":65.3,"id_mm":11.525590551181104,"weight":54.9},{"od_mm":355,"od_inch":13.976,"grade":"PE 80","pn":"PN 16","min":48.0,"max":52.9,"id_mm":11.990157480314961,"weight":46.286},{"od_mm":355,"od_inch":13.976,"grade":"PE 100","pn":"PN 20","min":48.0,"max":52.9,"id_mm":11.990157480314961,"weight":46.286},{"od_mm":355,"od_inch":13.976,"grade":"PE 80","pn":"PN 12.5","min":39.5,"max":43.6,"id_mm":12.340551181102363,"weight":39.233},{"od_mm":355,"od_inch":13.976,"grade":"PE 100","pn":"PN 16","min":39.5,"max":43.6,"id_mm":12.340551181102363,"weight":39.233},{"od_mm":355,"od_inch":13.976,"grade":"PE 63","pn":"PN 8","min":32.3,"max":35.7,"id_mm":12.637795275590552,"weight":32.877},{"od_mm":355,"od_inch":13.976,"grade":"PE 80","pn":"PN 10","min":32.3,"max":35.7,"id_mm":12.637795275590552,"weight":32.877},{"od_mm":355,"od_inch":13.976,"grade":"PE 100","pn":"PN 12.5","min":32.3,"max":35.7,"id_mm":12.637795275590552,"weight":32.877},{"od_mm":355,"od_inch":13.976,"grade":"PE 63","pn":"PN 6","min":26.2,"max":29.0,"id_mm":12.88976377952756,"weight":27.22},{"od_mm":355,"od_inch":13.976,"grade":"PE 80","pn":"PN 8","min":26.2,"max":29.0,"id_mm":12.88976377952756,"weight":27.22},{"od_mm":355,"od_inch":13.976,"grade":"PE 100","pn":"PN 10","min":26.2,"max":29.0,"id_mm":12.88976377952756,"weight":27.22},{"od_mm":355,"od_inch":13.976,"grade":"PE 63","pn":"PN 5","min":20.9,"max":23.1,"id_mm":13.110236220472443,"weight":22.068},{"od_mm":355,"od_inch":13.976,"grade":"PE 80","pn":"PN 6","min":20.9,"max":23.1,"id_mm":13.110236220472443,"weight":22.068},{"od_mm":355,"od_inch":13.976,"grade":"PE 100","pn":"PN 8","min":20.9,"max":23.1,"id_mm":13.110236220472443,"weight":22.068},{"od_mm":355,"od_inch":13.976,"grade":"PE 63","pn":"PN 4","min":17.0,"max":18.8,"id_mm":13.271653543307089,"weight":18.176},{"od_mm":355,"od_inch":13.976,"grade":"PE 80","pn":"PN 5","min":17.0,"max":18.8,"id_mm":13.271653543307089,"weight":18.176},{"od_mm":355,"od_inch":13.976,"grade":"PE 100","pn":"PN 6","min":17.0,"max":18.8,"id_mm":13.271653543307089,"weight":18.176},{"od_mm":355,"od_inch":13.976,"grade":"PE 63","pn":"PN 3.2","min":13.7,"max":15.2,"id_mm":13.407480314960631,"weight":14.823},{"od_mm":355,"od_inch":13.976,"grade":"PE 80","pn":"PN 4","min":13.7,"max":15.2,"id_mm":13.407480314960631,"weight":14.823},{"od_mm":355,"od_inch":13.976,"grade":"PE 100","pn":"PN 5","min":13.7,"max":15.2,"id_mm":13.407480314960631,"weight":14.823},{"od_mm":355,"od_inch":13.976,"grade":"PE 63","pn":"PN 2.5","min":10.8,"max":12.0,"id_mm":13.527559055118111,"weight":11.799},{"od_mm":355,"od_inch":13.976,"grade":"PE 80","pn":"PN 3.2","min":10.8,"max":12.0,"id_mm":13.527559055118111,"weight":11.799},{"od_mm":355,"od_inch":13.976,"grade":"PE 100","pn":"PN 4","min":10.8,"max":12.0,"id_mm":13.527559055118111,"weight":11.799},{"od_mm":355,"od_inch":13.976,"grade":"PE 63","pn":"PN 2","min":8.7,"max":9.7,"id_mm":13.614173228346457,"weight":9.583},{"od_mm":355,"od_inch":13.976,"grade":"PE 80","pn":"PN 2.5","min":8.7,"max":9.7,"id_mm":13.614173228346457,"weight":9.583},{"od_mm":355,"od_inch":13.976,"grade":"PE 100","pn":"PN 3.2","min":8.7,"max":9.7,"id_mm":13.614173228346457,"weight":9.583},{"od_mm":400,"od_inch":15.748,"grade":"PE 80","pn":"PN 20","min":66.7,"max":73.5,"id_mm":12.988188976377952,"weight":69.662},{"od_mm":400,"od_inch":15.748,"grade":"PE 80","pn":"PN 16","min":54.1,"max":59.7,"id_mm":13.507874015748033,"weight":58.804},{"od_mm":400,"od_inch":15.748,"grade":"PE 100","pn":"PN 20","min":54.1,"max":59.7,"id_mm":13.507874015748033,"weight":58.804},{"od_mm":400,"od_inch":15.748,"grade":"PE 80","pn":"PN 12.5","min":44.5,"max":49.1,"id_mm":13.905511811023622,"weight":49.789},{"od_mm":400,"od_inch":15.748,"grade":"PE 100","pn":"PN 16","min":44.5,"max":49.1,"id_mm":13.905511811023622,"weight":49.789},{"od_mm":400,"od_inch":15.748,"grade":"PE 63","pn":"PN 8","min":36.4,"max":40.2,"id_mm":14.240157480314961,"weight":41.726},{"od_mm":400,"od_inch":15.748,"grade":"PE 80","pn":"PN 10","min":36.4,"max":40.2,"id_mm":14.240157480314961,"weight":41.726},{"od_mm":400,"od_inch":15.748,"grade":"PE 100","pn":"PN 12.5","min":36.4,"max":40.2,"id_mm":14.240157480314961,"weight":41.726},{"od_mm":400,"od_inch":15.748,"grade":"PE 63","pn":"PN 6","min":29.5,"max":32.6,"id_mm":14.525590551181102,"weight":34.505},{"od_mm":400,"od_inch":15.748,"grade":"PE 80","pn":"PN 8","min":29.5,"max":32.6,"id_mm":14.525590551181102,"weight":34.505},{"od_mm":400,"od_inch":15.748,"grade":"PE 100","pn":"PN 10","min":29.5,"max":32.6,"id_mm":14.525590551181102,"weight":34.505},{"od_mm":400,"od_inch":15.748,"grade":"PE 63","pn":"PN 5","min":23.6,"max":26.1,"id_mm":14.769685039370078,"weight":28.079},{"od_mm":400,"od_inch":15.748,"grade":"PE 80","pn":"PN 6","min":23.6,"max":26.1,"id_mm":14.769685039370078,"weight":28.079},{"od_mm":400,"od_inch":15.748,"grade":"PE 100","pn":"PN 8","min":23.6,"max":26.1,"id_mm":14.769685039370078,"weight":28.079},{"od_mm":400,"od_inch":15.748,"grade":"PE 63","pn":"PN 4","min":19.1,"max":21.2,"id_mm":14.95472440944882,"weight":23.053},{"od_mm":400,"od_inch":15.748,"grade":"PE 80","pn":"PN 5","min":19.1,"max":21.2,"id_mm":14.95472440944882,"weight":23.053},{"od_mm":400,"od_inch":15.748,"grade":"PE 100","pn":"PN 6","min":19.1,"max":21.2,"id_mm":14.95472440944882,"weight":23.053},{"od_mm":400,"od_inch":15.748,"grade":"PE 63","pn":"PN 3.2","min":15.4,"max":17.1,"id_mm":15.108267716535433,"weight":18.782},{"od_mm":400,"od_inch":15.748,"grade":"PE 80","pn":"PN 4","min":15.4,"max":17.1,"id_mm":15.108267716535433,"weight":18.782},{"od_mm":400,"od_inch":15.748,"grade":"PE 100","pn":"PN 5","min":15.4,"max":17.1,"id_mm":15.108267716535433,"weight":18.782},{"od_mm":400,"od_inch":15.748,"grade":"PE 63","pn":"PN 2.5","min":12.2,"max":13.6,"id_mm":15.240157480314963,"weight":15.04},{"od_mm":400,"od_inch":15.748,"grade":"PE 80","pn":"PN 3.2","min":12.2,"max":13.6,"id_mm":15.240157480314963,"weight":15.04},{"od_mm":400,"od_inch":15.748,"grade":"PE 100","pn":"PN 4","min":12.2,"max":13.6,"id_mm":15.240157480314963,"weight":15.04},{"od_mm":400,"od_inch":15.748,"grade":"PE 63","pn":"PN 2","min":9.8,"max":10.9,"id_mm":15.340551181102363,"weight":12.147},{"od_mm":400,"od_inch":15.748,"grade":"PE 80","pn":"PN 2.5","min":9.8,"max":10.9,"id_mm":15.340551181102363,"weight":12.147},{"od_mm":400,"od_inch":15.748,"grade":"PE 100","pn":"PN 3.2","min":9.8,"max":10.9,"id_mm":15.340551181102363,"weight":12.147},{"od_mm":450,"od_inch":17.717,"grade":"PE 80","pn":"PN 20","min":75.0,"max":82.6,"id_mm":14.614173228346457,"weight":88.111},{"od_mm":450,"od_inch":17.717,"grade":"PE 80","pn":"PN 16","min":60.9,"max":67.1,"id_mm":15.196850393700789,"weight":74.413},{"od_mm":450,"od_inch":17.717,"grade":"PE 100","pn":"PN 20","min":60.9,"max":67.1,"id_mm":15.196850393700789,"weight":74.413},{"od_mm":450,"od_inch":17.717,"grade":"PE 80","pn":"PN 12.5","min":50.0,"max":55.1,"id_mm":15.64763779527559,"weight":62.912},{"od_mm":450,"od_inch":17.717,"grade":"PE 100","pn":"PN 16","min":50.0,"max":55.1,"id_mm":15.64763779527559,"weight":62.912},{"od_mm":450,"od_inch":17.717,"grade":"PE 63","pn":"PN 8","min":41.0,"max":45.2,"id_mm":16.019685039370078,"weight":52.824},{"od_mm":450,"od_inch":17.717,"grade":"PE 80","pn":"PN 10","min":41.0,"max":45.2,"id_mm":16.019685039370078,"weight":52.824},{"od_mm":450,"od_inch":17.717,"grade":"PE 100","pn":"PN 12.5","min":41.0,"max":45.2,"id_mm":16.019685039370078,"weight":52.824},{"od_mm":450,"od_inch":17.717,"grade":"PE 63","pn":"PN 6","min":33.1,"max":36.6,"id_mm":16.344488188976378,"weight":43.578},{"od_mm":450,"od_inch":17.717,"grade":"PE 80","pn":"PN 8","min":33.1,"max":36.6,"id_mm":16.344488188976378,"weight":43.578},{"od_mm":450,"od_inch":17.717,"grade":"PE 100","pn":"PN 10","min":33.1,"max":36.6,"id_mm":16.344488188976378,"weight":43.578},{"od_mm":450,"od_inch":17.717,"grade":"PE 63","pn":"PN 5","min":26.5,"max":29.3,"id_mm":16.618110236220474,"weight":35.471},{"od_mm":450,"od_inch":17.717,"grade":"PE 80","pn":"PN 6","min":26.5,"max":29.3,"id_mm":16.618110236220474,"weight":35.471},{"od_mm":450,"od_inch":17.717,"grade":"PE 100","pn":"PN 8","min":26.5,"max":29.3,"id_mm":16.618110236220474,"weight":35.471},{"od_mm":450,"od_inch":17.717,"grade":"PE 63","pn":"PN 4","min":21.5,"max":23.8,"id_mm":16.8248031496063,"weight":29.154},{"od_mm":450,"od_inch":17.717,"grade":"PE 80","pn":"PN 5","min":21.5,"max":23.8,"id_mm":16.8248031496063,"weight":29.154},{"od_mm":450,"od_inch":17.717,"grade":"PE 100","pn":"PN 6","min":21.5,"max":23.8,"id_mm":16.8248031496063,"weight":29.154},{"od_mm":450,"od_inch":17.717,"grade":"PE 63","pn":"PN 3.2","min":17.4,"max":19.3,"id_mm":16.994094488188978,"weight":23.857},{"od_mm":450,"od_inch":17.717,"grade":"PE 80","pn":"PN 4","min":17.4,"max":19.3,"id_mm":16.994094488188978,"weight":23.857},{"od_mm":450,"od_inch":17.717,"grade":"PE 100","pn":"PN 5","min":17.4,"max":19.3,"id_mm":16.994094488188978,"weight":23.857},{"od_mm":450,"od_inch":17.717,"grade":"PE 63","pn":"PN 2.5","min":13.7,"max":15.2,"id_mm":17.147637795275593,"weight":18.956},{"od_mm":450,"od_inch":17.717,"grade":"PE 80","pn":"PN 3.2","min":13.7,"max":15.2,"id_mm":17.147637795275593,"weight":18.956},{"od_mm":450,"od_inch":17.717,"grade":"PE 100","pn":"PN 4","min":13.7,"max":15.2,"id_mm":17.147637795275593,"weight":18.956},{"od_mm":450,"od_inch":17.717,"grade":"PE 63","pn":"PN 2","min":11.0,"max":12.2,"id_mm":17.25984251968504,"weight":15.317},{"od_mm":450,"od_inch":17.717,"grade":"PE 80","pn":"PN 2.5","min":11.0,"max":12.2,"id_mm":17.25984251968504,"weight":15.317},{"od_mm":450,"od_inch":17.717,"grade":"PE 100","pn":"PN 3.2","min":11.0,"max":12.2,"id_mm":17.25984251968504,"weight":15.317}];
+const REF_DATA = [{"od_inch":0.79,"od_mm":20},{"od_inch":0.98,"od_mm":25},{"od_inch":1.26,"od_mm":32},{"od_inch":1.57,"od_mm":40},{"od_inch":1.97,"od_mm":50},{"od_inch":2.48,"od_mm":63},{"od_inch":2.95,"od_mm":75},{"od_inch":3.54,"od_mm":90},{"od_inch":4.33,"od_mm":110},{"od_inch":4.92,"od_mm":125},{"od_inch":5.51,"od_mm":140},{"od_inch":6.3,"od_mm":160},{"od_inch":7.09,"od_mm":180},{"od_inch":7.87,"od_mm":200},{"od_inch":8.86,"od_mm":225},{"od_inch":9.84,"od_mm":250},{"od_inch":11.02,"od_mm":280},{"od_inch":12.4,"od_mm":315},{"od_inch":13.98,"od_mm":355},{"od_inch":15.75,"od_mm":400},{"od_inch":17.72,"od_mm":450}];
+
+const odSel = document.getElementById('odSel');
+const gradeSel = document.getElementById('gradeSel');
+const pnSel = document.getElementById('pnSel');
+const exactResult = document.getElementById('exactResult');
+const equivTableBody = document.querySelector('#equivTable tbody');
+const idSummary = document.getElementById('idSummary');
+const idTableBody = document.querySelector('#idTable tbody');
+
+function formatNum(n, digits = 2) {
+  if (n === null || n === undefined || Number.isNaN(Number(n))) return '-';
+  const num = Number(n);
+  const s = num.toFixed(digits);
+  return s.replace(/\.0+$/, '').replace(/(\.[0-9]*?)0+$/, '$1');
+}
+
+function buildReferenceTable() {
+  const headRow = document.querySelector('#refTable thead tr');
+  const bodyRow = document.querySelector('#refTable tbody tr');
+  headRow.innerHTML = '<th>OD Inch</th>' + REF_DATA.map(r => `<th>${formatNum(r.od_inch, 2)}</th>`).join('');
+  bodyRow.innerHTML = '<th>OD MM</th>' + REF_DATA.map(r => `<td>${r.od_mm}</td>`).join('');
+}
+
+function uniqueSorted(arr) {
+  return [...new Set(arr)].sort((a,b) => {
+    const na = Number(a), nb = Number(b);
+    if (!Number.isNaN(na) && !Number.isNaN(nb)) return na - nb;
+    return String(a).localeCompare(String(b), undefined, {numeric:true});
+  });
+}
+
+function populateODs() {
+  const ods = uniqueSorted(PIPE_DATA.map(r => r.od_mm));
+  odSel.innerHTML = '<option value="">Select OD</option>' + ods.map(od => `<option value="${od}">${od}</option>`).join('');
+  gradeSel.innerHTML = '<option value="">Select Grade</option>';
+  pnSel.innerHTML = '<option value="">Select PN</option>';
+}
+
+function populateGrades() {
+  const od = odSel.value;
+  const grades = uniqueSorted(PIPE_DATA.filter(r => String(r.od_mm) === String(od)).map(r => r.grade));
+  gradeSel.innerHTML = '<option value="">Select Grade</option>' + grades.map(g => `<option value="${g}">${g}</option>`).join('');
+  pnSel.innerHTML = '<option value="">Select PN</option>';
+}
+
+function populatePNs() {
+  const od = odSel.value;
+  const grade = gradeSel.value;
+  const pns = uniqueSorted(PIPE_DATA.filter(r => String(r.od_mm) === String(od) && r.grade === grade).map(r => r.pn));
+  pnSel.innerHTML = '<option value="">Select PN</option>' + pns.map(p => `<option value="${p}">${p}</option>`).join('');
+}
+
+function selectedRecord() {
+  const od = odSel.value;
+  const grade = gradeSel.value;
+  const pn = pnSel.value;
+  return PIPE_DATA.find(r => String(r.od_mm) === String(od) && r.grade === grade && r.pn === pn) || null;
+}
+
+function renderExactRecord() {
+  const rec = selectedRecord();
+  if (!rec) {
+    exactResult.innerHTML = '<div class="empty">Choose OD, Grade and PN to see the exact row.</div>';
+    equivTableBody.innerHTML = '<tr><td colspan="7" class="empty">Equivalent combinations will appear here.</td></tr>';
+    return;
+  }
+
+  exactResult.innerHTML = `
+    <div class="result-grid">
+      <div class="pill"><div class="k">OD MM</div><div class="v">${rec.od_mm}</div></div>
+      <div class="pill"><div class="k">Grade</div><div class="v">${rec.grade}</div></div>
+      <div class="pill"><div class="k">PN</div><div class="v">${rec.pn}</div></div>
+      <div class="pill"><div class="k">ID MM</div><div class="v">${formatNum(rec.id_mm, 2)}</div></div>
+    </div>
+    <div class="result-grid" style="margin-top:10px;">
+      <div class="pill"><div class="k">Min</div><div class="v">${formatNum(rec.min, 1)}</div></div>
+      <div class="pill"><div class="k">Max</div><div class="v">${formatNum(rec.max, 1)}</div></div>
+      <div class="pill"><div class="k">Weight</div><div class="v">${formatNum(rec.weight, 3)}</div></div>
+      <div class="pill"><div class="k">Wall Thickness</div><div class="v">${formatNum(rec.min, 1)} – ${formatNum(rec.max, 1)}</div></div>
+    </div>
+  `;
+
+  // Equivalent combinations: same OD + same Min/Max (same wall thickness) as per your sheet
+  const equivalents = PIPE_DATA
+    .filter(r => String(r.od_mm) === String(rec.od_mm) && r.min === rec.min && r.max === rec.max)
+    .sort((a,b) => String(a.grade).localeCompare(String(b.grade), undefined, {numeric:true}) || String(a.pn).localeCompare(String(b.pn), undefined, {numeric:true}));
+
+  if (!equivalents.length) {
+    equivTableBody.innerHTML = '<tr><td colspan="7" class="empty">No equivalent combinations found.</td></tr>';
+    return;
+  }
+
+  equivTableBody.innerHTML = equivalents.map(r => `
+    <tr>
+      <td>${r.od_mm}</td>
+      <td>${r.grade}</td>
+      <td>${r.pn}</td>
+      <td>${formatNum(r.min, 1)}</td>
+      <td>${formatNum(r.max, 1)}</td>
+      <td>${formatNum(r.id_mm, 2)}</td>
+      <td>${formatNum(r.weight, 3)}</td>
+    </tr>
+  `).join('');
+}
+
+function searchByID() {
+  const id = parseFloat(document.getElementById('idInput').value);
+  const tol = Math.abs(parseFloat(document.getElementById('tolInput').value || '0.05'));
+
+  if (Number.isNaN(id)) {
+    idSummary.innerHTML = '<div class="empty">Please enter a valid ID.</div>';
+    idTableBody.innerHTML = '<tr><td colspan="7" class="empty">No result.</td></tr>';
+    return;
+  }
+
+  const results = PIPE_DATA
+    .map(r => ({ ...r, diff: Math.abs(r.id_mm - id) }))
+    .filter(r => r.diff <= tol)
+    .sort((a,b) => a.diff - b.diff || a.od_mm - b.od_mm || String(a.grade).localeCompare(String(b.grade), undefined, {numeric:true}) || String(a.pn).localeCompare(String(b.pn), undefined, {numeric:true}));
+
+  idSummary.innerHTML = `
+    <div class="result-grid">
+      <div class="pill"><div class="k">Entered ID</div><div class="v">${formatNum(id, 2)}</div></div>
+      <div class="pill"><div class="k">Tolerance</div><div class="v">±${formatNum(tol, 2)}</div></div>
+      <div class="pill"><div class="k">Matches</div><div class="v">${results.length}</div></div>
+      <div class="pill"><div class="k">Range</div><div class="v">${formatNum(id - tol, 2)} – ${formatNum(id + tol, 2)}</div></div>
+    </div>
+  `;
+
+  if (!results.length) {
+    idTableBody.innerHTML = '<tr><td colspan="7" class="empty">No matching pipes found in the selected range.</td></tr>';
+    return;
+  }
+
+  idTableBody.innerHTML = results.map(r => `
+    <tr>
+      <td>${r.od_mm}</td>
+      <td>${r.grade}</td>
+      <td>${r.pn}</td>
+      <td>${formatNum(r.min, 1)}</td>
+      <td>${formatNum(r.max, 1)}</td>
+      <td>${formatNum(r.id_mm, 2)}</td>
+      <td>${formatNum(r.weight, 3)}</td>
+    </tr>
+  `).join('');
+}
+
+odSel.addEventListener('change', () => {
+  populateGrades();
+  renderExactRecord();
+});
+gradeSel.addEventListener('change', () => {
+  populatePNs();
+  renderExactRecord();
+});
+pnSel.addEventListener('change', renderExactRecord);
+document.getElementById('findBtn').addEventListener('click', renderExactRecord);
+document.getElementById('idBtn').addEventListener('click', searchByID);
+
+buildReferenceTable();
+populateODs();
+</script>
+</body>
+</html>
