@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Duraxia Pipe Calculator</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --surface2: #1c2230;
+      --border: #2a3347;
+      --border2: #3a4a66;
+      --text: #e6edf3;
+      --muted: #7d8fa6;
+      --accent: #f0b429;
+      --accent2: #e5532a;
+      --blue: #4a8fff;
+      --green: #3fb950;
+      --pill-bg: #1a2235;
+      --radius: 14px;
+      --radius-sm: 8px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Sora', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      font-size: 14px;
+    }
+
+    /* ── Header ── */
+    .header {
+      background: #0d1117;
+      border-bottom: 1px solid var(--border);
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .header-logo {
+      width: 52px; height: 52px;
+      border-radius: 10px;
+      overflow: hidden;
+      flex-shrink: 0;
+      background: #fff;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .header-logo img { width: 100%; height: 100%; object-fit: contain; }
+    .header-text h1 {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #fff;
+    }
+    .header-text p {
+      color: var(--muted);
+      font-size: 11px;
+      margin-top: 2px;
+    }
+
+    /* ── MRP Calculator Bar ── */
+    .mrp-bar {
+      background: #111827;
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px 18px;
+    }
+    .mrp-bar-inner {
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+    .mrp-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .mrp-label::before {
+      content: '';
+      width: 3px; height: 12px;
+      background: var(--accent);
+      border-radius: 2px;
+    }
+    /* 3-column layout: material-mix | divider | calculation */
+    .mrp-layout {
+      display: flex;
+      gap: 0;
+      align-items: stretch;
+    }
+    /* Left: Virgin + RP stacked */
+    .mrp-mix-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .mrp-mix-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .mrp-mix-badge {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      width: 40px;
+      flex-shrink: 0;
+      padding: 3px 0;
+    }
+    .mrp-mix-badge.virgin { color: #60d394; }
+    .mrp-mix-badge.rp     { color: #f76e6e; }
+    .mrp-field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .mrp-field label {
+      font-size: 10px;
+      color: var(--muted);
+      font-weight: 500;
+      letter-spacing: 0.03em;
+    }
+    .mrp-field input {
+      background: #0d1117;
+      border: 1px solid var(--border2);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      padding: 8px 10px;
+      width: 110px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .mrp-field input.pct-input { width: 68px; }
+    .mrp-field input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(240,180,41,0.12);
+    }
+    .mrp-field input[readonly] { opacity: 0.55; cursor: not-allowed; }
+    /* vertical divider */
+    .mrp-vdiv {
+      width: 1px;
+      background: var(--border);
+      margin: 0 18px;
+      flex-shrink: 0;
+    }
+    /* Right: chain of calc steps */
+    .mrp-chain {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .mrp-op {
+      color: var(--muted);
+      font-size: 16px;
+      font-family: 'DM Mono', monospace;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+    .mrp-info-box {
+      background: rgba(74,143,255,0.07);
+      border: 1px solid rgba(74,143,255,0.22);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+    }
+    .mrp-info-box .lbl {
+      font-size: 9px;
+      color: var(--blue);
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      margin-bottom: 3px;
+    }
+    .mrp-info-box .val {
+      font-family: 'DM Mono', monospace;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--blue);
+    }
+    .mrp-result-box {
+      background: rgba(240,180,41,0.08);
+      border: 1px solid rgba(240,180,41,0.35);
+      border-radius: var(--radius-sm);
+      padding: 8px 14px;
+    }
+    .mrp-result-box .lbl {
+      font-size: 9px;
+      color: var(--accent);
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      margin-bottom: 3px;
+    }
+    .mrp-result-box .val {
+      font-family: 'DM Mono', monospace;
+      font-size: 18px;
+      font-weight: 500;
+      color: var(--accent);
+    }
+    /* mobile MRP */
+    @media (max-width: 860px) {
+      .mrp-layout { flex-direction: column; gap: 12px; }
+      .mrp-vdiv { width: 100%; height: 1px; margin: 0; }
+      /* On mobile: chain becomes a tidy 2-row grid */
+      .mrp-chain {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        grid-template-rows: auto auto;
+        gap: 6px 8px;
+        align-items: center;
+      }
+      .mrp-chain-blend  { grid-column: 1; grid-row: 1; }
+      .mrp-chain-plus   { grid-column: 2; grid-row: 1; text-align: center; }
+      .mrp-chain-conv   { grid-column: 3; grid-row: 1; }
+      .mrp-chain-conv input { width: 100% !important; }
+      .mrp-chain-eq1    { display: none; }
+      .mrp-chain-final  { display: none; }
+      .mrp-chain-times  { display: none; }
+      .mrp-chain-mrp    { grid-column: 1 / -1; grid-row: 2; }
+      .mrp-result-box   { width: 100%; }
+      .mrp-result-box .val { font-size: 22px; }
+      /* show final rate in MRP label */
+      .mrp-chain-mrp .lbl { font-size: 10px; }
+    }
+    @media (max-width: 480px) {
+      .mrp-mix-row { gap: 6px; }
+      .mrp-field input { width: 95px; }
+      .mrp-field input.pct-input { width: 56px; }
+      .mrp-mix-badge { width: 32px; font-size: 9px; }
+    }
+
+    /* ── OD Reference Grid ── */
+    .od-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(76px, 1fr));
+      gap: 6px;
+    }
+    .od-chip {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px 6px;
+      text-align: center;
+      cursor: default;
+      transition: border-color 0.15s;
+    }
+    .od-chip:hover { border-color: var(--border2); }
+    .od-chip .od-mm {
+      font-family: 'DM Mono', monospace;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--accent);
+      line-height: 1;
+    }
+    .od-chip .od-inch {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 3px;
+      line-height: 1;
+    }
+
+    /* ── Wrap ── */
+    .wrap {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 20px 24px;
+    }
+
+    /* ── Section Label ── */
+    .section-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── Reference Grid card ── */
+    .ref-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+      margin-bottom: 20px;
+    }
+
+    /* ── Shared table base ── */
+    table { border-collapse: collapse; width: 100%; }
+    th, td {
+      padding: 9px 12px;
+      border-bottom: 1px solid var(--border);
+      text-align: center;
+      white-space: nowrap;
+      font-size: 13px;
+    }
+    th {
+      background: var(--surface2);
+      font-weight: 600;
+      color: var(--muted);
+      font-size: 11px;
+      letter-spacing: 0.04em;
+    }
+    tr:last-child td { border-bottom: none; }
+    tbody tr:hover td { background: rgba(255,255,255,0.02); }
+
+    /* ── Main Grid ── */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    /* ── Card ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+    }
+    .card-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: #fff;
+    }
+    .card-sub {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    /* ── Controls ── */
+    .controls-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .controls-id {
+      display: grid;
+      grid-template-columns: 1fr 120px auto;
+      gap: 10px;
+      margin-bottom: 12px;
+      align-items: flex-end;
+    }
+    .field { display: flex; flex-direction: column; gap: 5px; }
+    .field label {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+    select, input[type="number"], input[type="text"] {
+      background: #0d1117;
+      border: 1px solid var(--border2);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-family: 'Sora', sans-serif;
+      font-size: 13px;
+      padding: 9px 12px;
+      width: 100%;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%237d8fa6' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 32px;
+    }
+    select:focus, input:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(74,143,255,0.12);
+    }
+    button {
+      border: 0;
+      border-radius: var(--radius-sm);
+      padding: 10px 16px;
+      font-family: 'Sora', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.1s;
+      white-space: nowrap;
+    }
+    button:active { transform: scale(0.97); }
+    button.primary {
+      background: var(--blue);
+      color: #fff;
+    }
+    button.primary:hover { opacity: 0.88; }
+    .find-btn-wrap {
+      display: flex;
+      align-items: flex-end;
+    }
+    .find-btn-wrap button { width: 100%; }
+
+    /* ── Result Pills ── */
+    .result-box {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+    .result-empty {
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+      padding: 16px 0;
+    }
+    .pills-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+    .pill {
+      background: var(--pill-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+    }
+    .pill .k {
+      font-size: 10px;
+      color: var(--muted);
+      font-weight: 500;
+      margin-bottom: 4px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .pill .v {
+      font-family: 'DM Mono', monospace;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text);
+    }
+    .pill.accent { border-color: rgba(240,180,41,0.4); background: rgba(240,180,41,0.06); }
+    .pill.accent .k { color: var(--accent); }
+    .pill.accent .v { color: var(--accent); }
+    .pill.blue { border-color: rgba(74,143,255,0.3); background: rgba(74,143,255,0.06); }
+    .pill.blue .v { color: var(--blue); }
+
+    /* ── Data Tables ── */
+    .table-wrap {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      overflow: auto;
+      max-height: 320px;
+    }
+    .table-wrap table th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+    .data-table td {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+    }
+    .data-table td:first-child,
+    .data-table th:first-child { text-align: left; }
+    .data-table .highlight td { color: var(--accent); background: rgba(240,180,41,0.04); }
+    .data-table .mrp-cell {
+      color: var(--accent);
+      font-weight: 500;
+    }
+    .empty-row td {
+      text-align: center;
+      color: var(--muted);
+      padding: 20px;
+      font-family: 'Sora', sans-serif;
+    }
+
+    /* ── Sub heading ── */
+    .sub-heading {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin: 14px 0 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .sub-heading::before {
+      content: '';
+      width: 3px; height: 12px;
+      background: var(--blue);
+      border-radius: 2px;
+    }
+
+    /* ── Badge ── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      background: rgba(74,143,255,0.12);
+      border: 1px solid rgba(74,143,255,0.25);
+      color: var(--blue);
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 10px;
+      margin-left: auto;
+    }
+    .badge.green {
+      background: rgba(63,185,80,0.12);
+      border-color: rgba(63,185,80,0.25);
+      color: var(--green);
+    }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+    /* ── Mobile ── */
+    @media (max-width: 900px) {
+      .header { padding: 10px 14px; gap: 10px; }
+      .header-logo { width: 42px; height: 42px; }
+      .header-text h1 { font-size: 17px; }
+      .mrp-bar { padding: 12px 14px 14px; }
+      .wrap { padding: 14px; }
+      .main-grid { grid-template-columns: 1fr; }
+      .controls-3 { grid-template-columns: 1fr 1fr; }
+      .find-btn-wrap { grid-column: 1 / -1; }
+      .pills-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 560px) {
+      .controls-3 { grid-template-columns: 1fr; }
+      .controls-id { grid-template-columns: 1fr 1fr; }
+      .controls-id button { grid-column: 1 / -1; }
+      .pills-grid { grid-template-columns: 1fr 1fr; }
+      .od-grid { grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 5px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="header-logo">
+      <img src="data:image/jpeg;base64,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" alt="Duraxia Industries" />
+    </div>
+    <div class="header-text">
+      <h1>Duraxia Pipe Calculator</h1>
+      <p>Duraxia Industries</p>
+    </div>
+  </div>
+
+  <!-- Material Cost Calculator Bar -->
+  <div class="mrp-bar">
+    <div class="mrp-bar-inner">
+      <div class="mrp-label">Material Cost Calculator</div>
+      <div class="mrp-layout">
+
+        <!-- LEFT: Virgin + RP stacked -->
+        <div class="mrp-mix-panel">
+          <!-- Virgin row -->
+          <div class="mrp-mix-row">
+            <span class="mrp-mix-badge virgin">VGN</span>
+            <div class="mrp-field">
+              <label>Rate (₹/kg)</label>
+              <input type="number" id="virginRate" placeholder="e.g. 100" step="0.01" min="0" />
+            </div>
+            <div class="mrp-field">
+              <label>Mix %</label>
+              <input type="number" id="virginPct" class="pct-input" placeholder="80" step="1" min="0" max="100" value="100" />
+            </div>
+          </div>
+          <!-- RP row -->
+          <div class="mrp-mix-row">
+            <span class="mrp-mix-badge rp">RP</span>
+            <div class="mrp-field">
+              <label>Rate (₹/kg)</label>
+              <input type="number" id="rpRate" placeholder="e.g. 80" step="0.01" min="0" />
+            </div>
+            <div class="mrp-field">
+              <label>Mix % (auto)</label>
+              <input type="number" id="rpPct" class="pct-input" placeholder="20" step="1" min="0" max="100" value="0" readonly />
+            </div>
+          </div>
+        </div>
+
+        <!-- Divider -->
+        <div class="mrp-vdiv"></div>
+
+        <!-- RIGHT: Calculation chain -->
+        <div class="mrp-chain">
+          <div class="mrp-info-box mrp-chain-blend">
+            <div class="lbl">Blended Rate</div>
+            <div class="val" id="blendedDisplay">—</div>
+          </div>
+          <span class="mrp-op mrp-chain-plus">+</span>
+          <div class="mrp-field mrp-chain-conv">
+            <label>Conversion Cost (₹/kg)</label>
+            <input type="number" id="convCost" placeholder="e.g. 21" step="0.01" min="0" style="width:120px;" />
+          </div>
+          <span class="mrp-op mrp-chain-eq1">=</span>
+          <div class="mrp-info-box mrp-chain-final">
+            <div class="lbl">Final Rate / kg</div>
+            <div class="val" id="finalRateDisplay">—</div>
+          </div>
+          <span class="mrp-op mrp-chain-times">×&thinsp;wt</span>
+          <div class="mrp-result-box mrp-chain-mrp">
+            <div class="lbl">MRP (₹ / m) &nbsp;·&nbsp; Final: <span id="finalRateMobile">—</span></div>
+            <div class="val" id="mrpDisplay">—</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+
+    <!-- OD Reference Grid -->
+    <div class="section-label">OD Reference — mm / inch</div>
+    <div class="ref-card">
+      <div class="od-grid" id="odGrid"></div>
+    </div>
+
+    <!-- Main Grid -->
+    <div class="main-grid">
+
+      <!-- Left: Search by OD + Grade + PN -->
+      <div class="card">
+        <div class="card-title">Search by OD · Grade · PN</div>
+        <div class="card-sub">Select all three to see the exact row and equivalents</div>
+
+        <div class="controls-3">
+          <div class="field">
+            <label>OD (mm)</label>
+            <select id="odSel"></select>
+          </div>
+          <div class="field">
+            <label>Grade</label>
+            <select id="gradeSel"></select>
+          </div>
+          <div class="field">
+            <label>PN</label>
+            <select id="pnSel"></select>
+          </div>
+          <div class="find-btn-wrap" style="grid-column: 1 / -1;">
+            <button class="primary" id="findBtn" style="width:100%;">Find Exact Row</button>
+          </div>
+        </div>
+
+        <div class="result-box" id="exactResult">
+          <div class="result-empty">Choose OD, Grade and PN to see the exact row.</div>
+        </div>
+
+        <div class="sub-heading">
+          Equivalent Combinations
+          <span id="equivBadge"></span>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table" id="equivTable">
+            <thead>
+              <tr>
+                <th>OD mm</th><th>Grade</th><th>PN</th>
+                <th>Min</th><th>Max</th><th>ID mm</th>
+                <th>Wgt</th><th>MRP ₹/m</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="empty-row"><td colspan="8">Equivalent combinations will appear here.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Right: Search by ID -->
+      <div class="card">
+        <div class="card-title">Search by ID (mm)</div>
+        <div class="card-sub">Results sorted by weight (ascending) · Default tolerance ±0.05 mm</div>
+
+        <div class="controls-id">
+          <div class="field">
+            <label>ID (mm)</label>
+            <input id="idInput" type="number" step="0.01" placeholder="e.g. 1.75" />
+          </div>
+          <div class="field">
+            <label>Tolerance</label>
+            <input id="tolInput" type="number" step="0.01" value="0.05" />
+          </div>
+          <button class="primary" id="idBtn">Search</button>
+        </div>
+
+        <div class="result-box" id="idSummary">
+          <div class="result-empty">Enter an ID value and press Search.</div>
+        </div>
+
+        <div class="sub-heading">
+          Results
+          <span id="idBadge"></span>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table" id="idTable">
+            <thead>
+              <tr>
+                <th>OD mm</th><th>Grade</th><th>PN</th>
+                <th>Min</th><th>Max</th><th>ID mm</th>
+                <th>Wgt</th><th>MRP ₹/m</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="empty-row"><td colspan="8">No search performed yet.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+<script>
+const PIPE_DATA = [{"od_mm":20,"od_inch":0.787,"grade":"PE 80","pn":"PN 20","min":3.4,"max":3.9,"id_mm":0.6437007874015749,"weight":0.181},{"od_mm":20,"od_inch":0.787,"grade":"PE 80","pn":"PN 16","min":2.8,"max":3.2,"id_mm":0.6692913385826772,"weight":0.154},{"od_mm":20,"od_inch":0.787,"grade":"PE 100","pn":"PN 20","min":2.8,"max":3.2,"id_mm":0.6692913385826772,"weight":0.154},{"od_mm":20,"od_inch":0.787,"grade":"PE 80","pn":"PN 12.5","min":2.3,"max":2.7,"id_mm":0.6889763779527559,"weight":0.132},{"od_mm":20,"od_inch":0.787,"grade":"PE 100","pn":"PN 16","min":2.3,"max":2.7,"id_mm":0.6889763779527559,"weight":0.132},{"od_mm":20,"od_inch":0.787,"grade":"PE 63","pn":"PN 8","min":2.0,"max":2.3,"id_mm":0.7027559055118111,"weight":0.116},{"od_mm":20,"od_inch":0.787,"grade":"PE 80","pn":"PN 10","min":2.0,"max":2.3,"id_mm":0.7027559055118111,"weight":0.116},{"od_mm":20,"od_inch":0.787,"grade":"PE 100","pn":"PN 12.5","min":2.0,"max":2.3,"id_mm":0.7027559055118111,"weight":0.116},{"od_mm":25,"od_inch":0.984,"grade":"PE 80","pn":"PN 20","min":4.2,"max":4.8,"id_mm":0.8070866141732284,"weight":0.279},{"od_mm":25,"od_inch":0.984,"grade":"PE 80","pn":"PN 16","min":3.4,"max":3.9,"id_mm":0.8405511811023623,"weight":0.235},{"od_mm":25,"od_inch":0.984,"grade":"PE 100","pn":"PN 20","min":3.4,"max":3.9,"id_mm":0.8405511811023623,"weight":0.235},{"od_mm":25,"od_inch":0.984,"grade":"PE 80","pn":"PN 12.5","min":2.8,"max":3.2,"id_mm":0.8661417322834646,"weight":0.199},{"od_mm":25,"od_inch":0.984,"grade":"PE 100","pn":"PN 16","min":2.8,"max":3.2,"id_mm":0.8661417322834646,"weight":0.199},{"od_mm":25,"od_inch":0.984,"grade":"PE 63","pn":"PN 8","min":2.3,"max":2.7,"id_mm":0.8858267716535434,"weight":0.17},{"od_mm":25,"od_inch":0.984,"grade":"PE 80","pn":"PN 10","min":2.3,"max":2.7,"id_mm":0.8858267716535434,"weight":0.17},{"od_mm":25,"od_inch":0.984,"grade":"PE 100","pn":"PN 12.5","min":2.3,"max":2.7,"id_mm":0.8858267716535434,"weight":0.17},{"od_mm":25,"od_inch":0.984,"grade":"PE 63","pn":"PN 6","min":2.0,"max":2.3,"id_mm":0.8996062992125985,"weight":0.148},{"od_mm":25,"od_inch":0.984,"grade":"PE 80","pn":"PN 8","min":2.0,"max":2.3,"id_mm":0.8996062992125985,"weight":0.148},{"od_mm":25,"od_inch":0.984,"grade":"PE 100","pn":"PN 10","min":2.0,"max":2.3,"id_mm":0.8996062992125985,"weight":0.148},{"od_mm":32,"od_inch":1.26,"grade":"PE 80","pn":"PN 20","min":5.4,"max":6.1,"id_mm":1.033464566929134,"weight":0.455},{"od_mm":32,"od_inch":1.26,"grade":"PE 80","pn":"PN 16","min":4.4,"max":5.0,"id_mm":1.0748031496062993,"weight":0.387},{"od_mm":32,"od_inch":1.26,"grade":"PE 100","pn":"PN 20","min":4.4,"max":5.0,"id_mm":1.0748031496062993,"weight":0.387},{"od_mm":32,"od_inch":1.26,"grade":"PE 80","pn":"PN 12.5","min":3.6,"max":4.1,"id_mm":1.108267716535433,"weight":0.327},{"od_mm":32,"od_inch":1.26,"grade":"PE 100","pn":"PN 16","min":3.6,"max":4.1,"id_mm":1.108267716535433,"weight":0.327},{"od_mm":32,"od_inch":1.26,"grade":"PE 63","pn":"PN 8","min":3.0,"max":3.4,"id_mm":1.1338582677165354,"weight":0.278},{"od_mm":32,"od_inch":1.26,"grade":"PE 80","pn":"PN 10","min":3.0,"max":3.4,"id_mm":1.1338582677165354,"weight":0.278},{"od_mm":32,"od_inch":1.26,"grade":"PE 100","pn":"PN 12.5","min":3.0,"max":3.4,"id_mm":1.1338582677165354,"weight":0.278},{"od_mm":32,"od_inch":1.26,"grade":"PE 63","pn":"PN 6","min":2.4,"max":2.8,"id_mm":1.1574803149606299,"weight":0.231},{"od_mm":32,"od_inch":1.26,"grade":"PE 80","pn":"PN 8","min":2.4,"max":2.8,"id_mm":1.1574803149606299,"weight":0.231},{"od_mm":32,"od_inch":1.26,"grade":"PE 100","pn":"PN 10","min":2.4,"max":2.8,"id_mm":1.1574803149606299,"weight":0.231},{"od_mm":32,"od_inch":1.26,"grade":"PE 63","pn":"PN 5","min":2.0,"max":2.3,"id_mm":1.175196850393701,"weight":0.194},{"od_mm":32,"od_inch":1.26,"grade":"PE 80","pn":"PN 6","min":2.0,"max":2.3,"id_mm":1.175196850393701,"weight":0.194},{"od_mm":32,"od_inch":1.26,"grade":"PE 100","pn":"PN 8","min":2.0,"max":2.3,"id_mm":1.175196850393701,"weight":0.194},{"od_mm":40,"od_inch":1.575,"grade":"PE 80","pn":"PN 20","min":6.7,"max":7.5,"id_mm":1.295275590551181,"weight":0.705},{"od_mm":40,"od_inch":1.575,"grade":"PE 80","pn":"PN 16","min":5.5,"max":6.2,"id_mm":1.344488188976378,"weight":0.603},{"od_mm":40,"od_inch":1.575,"grade":"PE 100","pn":"PN 20","min":5.5,"max":6.2,"id_mm":1.344488188976378,"weight":0.603},{"od_mm":40,"od_inch":1.575,"grade":"PE 80","pn":"PN 12.5","min":4.5,"max":5.1,"id_mm":1.3858267716535435,"weight":0.51},{"od_mm":40,"od_inch":1.575,"grade":"PE 100","pn":"PN 16","min":4.5,"max":5.1,"id_mm":1.3858267716535435,"weight":0.51},{"od_mm":40,"od_inch":1.575,"grade":"PE 63","pn":"PN 8","min":3.7,"max":4.2,"id_mm":1.419291338582677,"weight":0.43},{"od_mm":40,"od_inch":1.575,"grade":"PE 80","pn":"PN 10","min":3.7,"max":4.2,"id_mm":1.419291338582677,"weight":0.43},{"od_mm":40,"od_inch":1.575,"grade":"PE 100","pn":"PN 12.5","min":3.7,"max":4.2,"id_mm":1.419291338582677,"weight":0.43},{"od_mm":40,"od_inch":1.575,"grade":"PE 63","pn":"PN 6","min":3.0,"max":3.4,"id_mm":1.4488188976377951,"weight":0.355},{"od_mm":40,"od_inch":1.575,"grade":"PE 80","pn":"PN 8","min":3.0,"max":3.4,"id_mm":1.4488188976377951,"weight":0.355},{"od_mm":40,"od_inch":1.575,"grade":"PE 100","pn":"PN 10","min":3.0,"max":3.4,"id_mm":1.4488188976377951,"weight":0.355},{"od_mm":40,"od_inch":1.575,"grade":"PE 63","pn":"PN 5","min":2.4,"max":2.8,"id_mm":1.4724409448818898,"weight":0.293},{"od_mm":40,"od_inch":1.575,"grade":"PE 80","pn":"PN 6","min":2.4,"max":2.8,"id_mm":1.4724409448818898,"weight":0.293},{"od_mm":40,"od_inch":1.575,"grade":"PE 100","pn":"PN 8","min":2.4,"max":2.8,"id_mm":1.4724409448818898,"weight":0.293},{"od_mm":40,"od_inch":1.575,"grade":"PE 63","pn":"PN 4","min":2.0,"max":2.3,"id_mm":1.4901574803149609,"weight":0.246},{"od_mm":40,"od_inch":1.575,"grade":"PE 80","pn":"PN 5","min":2.0,"max":2.3,"id_mm":1.4901574803149609,"weight":0.246},{"od_mm":40,"od_inch":1.575,"grade":"PE 100","pn":"PN 6","min":2.0,"max":2.3,"id_mm":1.4901574803149609,"weight":0.246},{"od_mm":50,"od_inch":1.969,"grade":"PE 80","pn":"PN 20","min":8.4,"max":9.4,"id_mm":1.6181102362204727,"weight":1.103},{"od_mm":50,"od_inch":1.969,"grade":"PE 80","pn":"PN 16","min":6.8,"max":7.6,"id_mm":1.68503937007874,"weight":0.929},{"od_mm":50,"od_inch":1.969,"grade":"PE 100","pn":"PN 20","min":6.8,"max":7.6,"id_mm":1.68503937007874,"weight":0.929},{"od_mm":50,"od_inch":1.969,"grade":"PE 80","pn":"PN 12.5","min":5.6,"max":6.3,"id_mm":1.734251968503937,"weight":0.79},{"od_mm":50,"od_inch":1.969,"grade":"PE 100","pn":"PN 16","min":5.6,"max":6.3,"id_mm":1.734251968503937,"weight":0.79},{"od_mm":50,"od_inch":1.969,"grade":"PE 63","pn":"PN 8","min":4.6,"max":5.2,"id_mm":1.7755905511811025,"weight":0.666},{"od_mm":50,"od_inch":1.969,"grade":"PE 80","pn":"PN 10","min":4.6,"max":5.2,"id_mm":1.7755905511811025,"weight":0.666},{"od_mm":50,"od_inch":1.969,"grade":"PE 100","pn":"PN 12.5","min":4.6,"max":5.2,"id_mm":1.7755905511811025,"weight":0.666},{"od_mm":50,"od_inch":1.969,"grade":"PE 63","pn":"PN 6","min":3.7,"max":4.2,"id_mm":1.8129921259842519,"weight":0.548},{"od_mm":50,"od_inch":1.969,"grade":"PE 80","pn":"PN 8","min":3.7,"max":4.2,"id_mm":1.8129921259842519,"weight":0.548},{"od_mm":50,"od_inch":1.969,"grade":"PE 100","pn":"PN 10","min":3.7,"max":4.2,"id_mm":1.8129921259842519,"weight":0.548},{"od_mm":50,"od_inch":1.969,"grade":"PE 63","pn":"PN 5","min":3.0,"max":3.4,"id_mm":1.8425196850393701,"weight":0.451},{"od_mm":50,"od_inch":1.969,"grade":"PE 80","pn":"PN 6","min":3.0,"max":3.4,"id_mm":1.8425196850393701,"weight":0.451},{"od_mm":50,"od_inch":1.969,"grade":"PE 100","pn":"PN 8","min":3.0,"max":3.4,"id_mm":1.8425196850393701,"weight":0.451},{"od_mm":50,"od_inch":1.969,"grade":"PE 63","pn":"PN 4","min":2.4,"max":2.8,"id_mm":1.8661417322834646,"weight":0.371},{"od_mm":50,"od_inch":1.969,"grade":"PE 80","pn":"PN 5","min":2.4,"max":2.8,"id_mm":1.8661417322834646,"weight":0.371},{"od_mm":50,"od_inch":1.969,"grade":"PE 100","pn":"PN 6","min":2.4,"max":2.8,"id_mm":1.8661417322834646,"weight":0.371},{"od_mm":50,"od_inch":1.969,"grade":"PE 63","pn":"PN 3.2","min":2.0,"max":2.3,"id_mm":1.8838582677165356,"weight":0.31},{"od_mm":50,"od_inch":1.969,"grade":"PE 80","pn":"PN 4","min":2.0,"max":2.3,"id_mm":1.8838582677165356,"weight":0.31},{"od_mm":50,"od_inch":1.969,"grade":"PE 100","pn":"PN 5","min":2.0,"max":2.3,"id_mm":1.8838582677165356,"weight":0.31},{"od_mm":63,"od_inch":2.48,"grade":"PE 80","pn":"PN 20","min":10.5,"max":11.7,"id_mm":2.043307086614173,"weight":1.735},{"od_mm":63,"od_inch":2.48,"grade":"PE 80","pn":"PN 16","min":8.6,"max":9.6,"id_mm":2.1220472440944884,"weight":1.478},{"od_mm":63,"od_inch":2.48,"grade":"PE 100","pn":"PN 20","min":8.6,"max":9.6,"id_mm":2.1220472440944884,"weight":1.478},{"od_mm":63,"od_inch":2.48,"grade":"PE 80","pn":"PN 12.5","min":7.0,"max":7.8,"id_mm":2.188976377952756,"weight":1.239},{"od_mm":63,"od_inch":2.48,"grade":"PE 100","pn":"PN 16","min":7.0,"max":7.8,"id_mm":2.188976377952756,"weight":1.239},{"od_mm":63,"od_inch":2.48,"grade":"PE 63","pn":"PN 8","min":5.8,"max":6.5,"id_mm":2.2381889763779528,"weight":1.053},{"od_mm":63,"od_inch":2.48,"grade":"PE 80","pn":"PN 10","min":5.8,"max":6.5,"id_mm":2.2381889763779528,"weight":1.053},{"od_mm":63,"od_inch":2.48,"grade":"PE 100","pn":"PN 12.5","min":5.8,"max":6.5,"id_mm":2.2381889763779528,"weight":1.053},{"od_mm":63,"od_inch":2.48,"grade":"PE 63","pn":"PN 6","min":4.7,"max":5.3,"id_mm":2.283464566929134,"weight":0.874},{"od_mm":63,"od_inch":2.48,"grade":"PE 80","pn":"PN 8","min":4.7,"max":5.3,"id_mm":2.283464566929134,"weight":0.874},{"od_mm":63,"od_inch":2.48,"grade":"PE 100","pn":"PN 10","min":4.7,"max":5.3,"id_mm":2.283464566929134,"weight":0.874},{"od_mm":63,"od_inch":2.48,"grade":"PE 63","pn":"PN 5","min":3.8,"max":4.3,"id_mm":2.320866141732284,"weight":0.719},{"od_mm":63,"od_inch":2.48,"grade":"PE 80","pn":"PN 6","min":3.8,"max":4.3,"id_mm":2.320866141732284,"weight":0.719},{"od_mm":63,"od_inch":2.48,"grade":"PE 100","pn":"PN 8","min":3.8,"max":4.3,"id_mm":2.320866141732284,"weight":0.719},{"od_mm":63,"od_inch":2.48,"grade":"PE 63","pn":"PN 4","min":3.0,"max":3.4,"id_mm":2.354330708661417,"weight":0.576},{"od_mm":63,"od_inch":2.48,"grade":"PE 80","pn":"PN 5","min":3.0,"max":3.4,"id_mm":2.354330708661417,"weight":0.576},{"od_mm":63,"od_inch":2.48,"grade":"PE 100","pn":"PN 6","min":3.0,"max":3.4,"id_mm":2.354330708661417,"weight":0.576},{"od_mm":63,"od_inch":2.48,"grade":"PE 63","pn":"PN 3.2","min":2.5,"max":2.9,"id_mm":2.3740157480314963,"weight":0.49},{"od_mm":63,"od_inch":2.48,"grade":"PE 80","pn":"PN 4","min":2.5,"max":2.9,"id_mm":2.3740157480314963,"weight":0.49},{"od_mm":63,"od_inch":2.48,"grade":"PE 100","pn":"PN 5","min":2.5,"max":2.9,"id_mm":2.3740157480314963,"weight":0.49},{"od_mm":75,"od_inch":2.953,"grade":"PE 80","pn":"PN 20","min":12.5,"max":13.9,"id_mm":2.4330708661417324,"weight":2.458},{"od_mm":75,"od_inch":2.953,"grade":"PE 80","pn":"PN 16","min":10.2,"max":11.4,"id_mm":2.5275590551181106,"weight":2.089},{"od_mm":75,"od_inch":2.953,"grade":"PE 100","pn":"PN 20","min":10.2,"max":11.4,"id_mm":2.5275590551181106,"weight":2.089},{"od_mm":75,"od_inch":2.953,"grade":"PE 80","pn":"PN 12.5","min":8.4,"max":9.4,"id_mm":2.6023622047244093,"weight":1.772},{"od_mm":75,"od_inch":2.953,"grade":"PE 100","pn":"PN 16","min":8.4,"max":9.4,"id_mm":2.6023622047244093,"weight":1.772},{"od_mm":75,"od_inch":2.953,"grade":"PE 63","pn":"PN 8","min":6.9,"max":7.7,"id_mm":2.6653543307086616,"weight":1.489},{"od_mm":75,"od_inch":2.953,"grade":"PE 80","pn":"PN 10","min":6.9,"max":7.7,"id_mm":2.6653543307086616,"weight":1.489},{"od_mm":75,"od_inch":2.953,"grade":"PE 100","pn":"PN 12.5","min":6.9,"max":7.7,"id_mm":2.6653543307086616,"weight":1.489},{"od_mm":75,"od_inch":2.953,"grade":"PE 63","pn":"PN 6","min":5.6,"max":6.3,"id_mm":2.718503937007874,"weight":1.238},{"od_mm":75,"od_inch":2.953,"grade":"PE 80","pn":"PN 8","min":5.6,"max":6.3,"id_mm":2.718503937007874,"weight":1.238},{"od_mm":75,"od_inch":2.953,"grade":"PE 100","pn":"PN 10","min":5.6,"max":6.3,"id_mm":2.718503937007874,"weight":1.238},{"od_mm":75,"od_inch":2.953,"grade":"PE 63","pn":"PN 5","min":4.5,"max":5.1,"id_mm":2.7637795275590555,"weight":1.015},{"od_mm":75,"od_inch":2.953,"grade":"PE 80","pn":"PN 6","min":4.5,"max":5.1,"id_mm":2.7637795275590555,"weight":1.015},{"od_mm":75,"od_inch":2.953,"grade":"PE 100","pn":"PN 8","min":4.5,"max":5.1,"id_mm":2.7637795275590555,"weight":1.015},{"od_mm":75,"od_inch":2.953,"grade":"PE 63","pn":"PN 4","min":3.6,"max":4.1,"id_mm":2.801181102362205,"weight":0.825},{"od_mm":75,"od_inch":2.953,"grade":"PE 80","pn":"PN 5","min":3.6,"max":4.1,"id_mm":2.801181102362205,"weight":0.825},{"od_mm":75,"od_inch":2.953,"grade":"PE 100","pn":"PN 6","min":3.6,"max":4.1,"id_mm":2.801181102362205,"weight":0.825},{"od_mm":75,"od_inch":2.953,"grade":"PE 63","pn":"PN 3.2","min":2.9,"max":3.3,"id_mm":2.830708661417323,"weight":0.671},{"od_mm":75,"od_inch":2.953,"grade":"PE 80","pn":"PN 4","min":2.9,"max":3.3,"id_mm":2.830708661417323,"weight":0.671},{"od_mm":75,"od_inch":2.953,"grade":"PE 100","pn":"PN 5","min":2.9,"max":3.3,"id_mm":2.830708661417323,"weight":0.671},{"od_mm":75,"od_inch":2.953,"grade":"PE 63","pn":"PN 2.5","min":2.3,"max":2.7,"id_mm":2.8543307086614176,"weight":0.546},{"od_mm":75,"od_inch":2.953,"grade":"PE 80","pn":"PN 3.2","min":2.3,"max":2.7,"id_mm":2.8543307086614176,"weight":0.546},{"od_mm":75,"od_inch":2.953,"grade":"PE 100","pn":"PN 4","min":2.3,"max":2.7,"id_mm":2.8543307086614176,"weight":0.546},{"od_mm":75,"od_inch":2.953,"grade":"PE 63","pn":"PN 2","min":2.0,"max":2.3,"id_mm":2.8681102362204722,"weight":0.472},{"od_mm":75,"od_inch":2.953,"grade":"PE 80","pn":"PN 2.5","min":2.0,"max":2.3,"id_mm":2.8681102362204722,"weight":0.472},{"od_mm":75,"od_inch":2.953,"grade":"PE 100","pn":"PN 3.2","min":2.0,"max":2.3,"id_mm":2.8681102362204722,"weight":0.472},{"od_mm":90,"od_inch":3.543,"grade":"PE 80","pn":"PN 20","min":15.0,"max":16.6,"id_mm":2.921259842519685,"weight":3.533},{"od_mm":90,"od_inch":3.543,"grade":"PE 80","pn":"PN 16","min":12.2,"max":13.6,"id_mm":3.0354330708661417,"weight":2.997},{"od_mm":90,"od_inch":3.543,"grade":"PE 100","pn":"PN 20","min":12.2,"max":13.6,"id_mm":3.0354330708661417,"weight":2.997},{"od_mm":90,"od_inch":3.543,"grade":"PE 80","pn":"PN 12.5","min":10.0,"max":11.1,"id_mm":3.127952755905512,"weight":2.526},{"od_mm":90,"od_inch":3.543,"grade":"PE 100","pn":"PN 16","min":10.0,"max":11.1,"id_mm":3.127952755905512,"weight":2.526},{"od_mm":90,"od_inch":3.543,"grade":"PE 63","pn":"PN 8","min":8.2,"max":9.2,"id_mm":3.2007874015748032,"weight":2.131},{"od_mm":90,"od_inch":3.543,"grade":"PE 80","pn":"PN 10","min":8.2,"max":9.2,"id_mm":3.2007874015748032,"weight":2.131},{"od_mm":90,"od_inch":3.543,"grade":"PE 100","pn":"PN 12.5","min":8.2,"max":9.2,"id_mm":3.2007874015748032,"weight":2.131},{"od_mm":90,"od_inch":3.543,"grade":"PE 63","pn":"PN 6","min":6.7,"max":7.5,"id_mm":3.2637795275590555,"weight":1.773},{"od_mm":90,"od_inch":3.543,"grade":"PE 80","pn":"PN 8","min":6.7,"max":7.5,"id_mm":3.2637795275590555,"weight":1.773},{"od_mm":90,"od_inch":3.543,"grade":"PE 100","pn":"PN 10","min":6.7,"max":7.5,"id_mm":3.2637795275590555,"weight":1.773},{"od_mm":90,"od_inch":3.543,"grade":"PE 63","pn":"PN 5","min":5.3,"max":6.0,"id_mm":3.3208661417322833,"weight":1.436},{"od_mm":90,"od_inch":3.543,"grade":"PE 80","pn":"PN 6","min":5.3,"max":6.0,"id_mm":3.3208661417322833,"weight":1.436},{"od_mm":90,"od_inch":3.543,"grade":"PE 100","pn":"PN 8","min":5.3,"max":6.0,"id_mm":3.3208661417322833,"weight":1.436},{"od_mm":90,"od_inch":3.543,"grade":"PE 63","pn":"PN 4","min":4.3,"max":4.9,"id_mm":3.362204724409449,"weight":1.183},{"od_mm":90,"od_inch":3.543,"grade":"PE 80","pn":"PN 5","min":4.3,"max":4.9,"id_mm":3.362204724409449,"weight":1.183},{"od_mm":90,"od_inch":3.543,"grade":"PE 100","pn":"PN 6","min":4.3,"max":4.9,"id_mm":3.362204724409449,"weight":1.183},{"od_mm":90,"od_inch":3.543,"grade":"PE 63","pn":"PN 3.2","min":3.5,"max":4.0,"id_mm":3.395669291338583,"weight":0.974},{"od_mm":90,"od_inch":3.543,"grade":"PE 80","pn":"PN 4","min":3.5,"max":4.0,"id_mm":3.395669291338583,"weight":0.974},{"od_mm":90,"od_inch":3.543,"grade":"PE 100","pn":"PN 5","min":3.5,"max":4.0,"id_mm":3.395669291338583,"weight":0.974},{"od_mm":90,"od_inch":3.543,"grade":"PE 63","pn":"PN 2.5","min":2.8,"max":3.2,"id_mm":3.425196850393701,"weight":0.786},{"od_mm":90,"od_inch":3.543,"grade":"PE 80","pn":"PN 3.2","min":2.8,"max":3.2,"id_mm":3.425196850393701,"weight":0.786},{"od_mm":90,"od_inch":3.543,"grade":"PE 100","pn":"PN 4","min":2.8,"max":3.2,"id_mm":3.425196850393701,"weight":0.786},{"od_mm":90,"od_inch":3.543,"grade":"PE 63","pn":"PN 2","min":2.2,"max":2.6,"id_mm":3.4488188976377954,"weight":0.633},{"od_mm":90,"od_inch":3.543,"grade":"PE 80","pn":"PN 2.5","min":2.2,"max":2.6,"id_mm":3.4488188976377954,"weight":0.633},{"od_mm":90,"od_inch":3.543,"grade":"PE 100","pn":"PN 3.2","min":2.2,"max":2.6,"id_mm":3.4488188976377954,"weight":0.633},{"od_mm":110,"od_inch":4.331,"grade":"PE 80","pn":"PN 20","min":18.4,"max":20.4,"id_mm":3.5669291338582676,"weight":5.295},{"od_mm":110,"od_inch":4.331,"grade":"PE 80","pn":"PN 16","min":14.9,"max":16.5,"id_mm":3.7125984251968505,"weight":4.46},{"od_mm":110,"od_inch":4.331,"grade":"PE 100","pn":"PN 20","min":14.9,"max":16.5,"id_mm":3.7125984251968505,"weight":4.46},{"od_mm":110,"od_inch":4.331,"grade":"PE 80","pn":"PN 12.5","min":12.3,"max":13.7,"id_mm":3.818897637795276,"weight":3.799},{"od_mm":110,"od_inch":4.331,"grade":"PE 100","pn":"PN 16","min":12.3,"max":13.7,"id_mm":3.818897637795276,"weight":3.799},{"od_mm":110,"od_inch":4.331,"grade":"PE 63","pn":"PN 8","min":10.0,"max":11.1,"id_mm":3.9153543307086616,"weight":3.161},{"od_mm":110,"od_inch":4.331,"grade":"PE 80","pn":"PN 10","min":10.0,"max":11.1,"id_mm":3.9153543307086616,"weight":3.161},{"od_mm":110,"od_inch":4.331,"grade":"PE 100","pn":"PN 12.5","min":10.0,"max":11.1,"id_mm":3.9153543307086616,"weight":3.161},{"od_mm":110,"od_inch":4.331,"grade":"PE 63","pn":"PN 6","min":8.1,"max":9.1,"id_mm":3.992125984251969,"weight":2.627},{"od_mm":110,"od_inch":4.331,"grade":"PE 80","pn":"PN 8","min":8.1,"max":9.1,"id_mm":3.992125984251969,"weight":2.627},{"od_mm":110,"od_inch":4.331,"grade":"PE 100","pn":"PN 10","min":8.1,"max":9.1,"id_mm":3.992125984251969,"weight":2.627},{"od_mm":110,"od_inch":4.331,"grade":"PE 63","pn":"PN 5","min":6.5,"max":7.3,"id_mm":4.059055118110236,"weight":2.143},{"od_mm":110,"od_inch":4.331,"grade":"PE 80","pn":"PN 6","min":6.5,"max":7.3,"id_mm":4.059055118110236,"weight":2.143},{"od_mm":110,"od_inch":4.331,"grade":"PE 100","pn":"PN 8","min":6.5,"max":7.3,"id_mm":4.059055118110236,"weight":2.143},{"od_mm":110,"od_inch":4.331,"grade":"PE 63","pn":"PN 4","min":5.3,"max":6.0,"id_mm":4.108267716535433,"weight":1.776},{"od_mm":110,"od_inch":4.331,"grade":"PE 80","pn":"PN 5","min":5.3,"max":6.0,"id_mm":4.108267716535433,"weight":1.776},{"od_mm":110,"od_inch":4.331,"grade":"PE 100","pn":"PN 6","min":5.3,"max":6.0,"id_mm":4.108267716535433,"weight":1.776},{"od_mm":110,"od_inch":4.331,"grade":"PE 63","pn":"PN 3.2","min":4.3,"max":4.9,"id_mm":4.149606299212599,"weight":1.46},{"od_mm":110,"od_inch":4.331,"grade":"PE 80","pn":"PN 4","min":4.3,"max":4.9,"id_mm":4.149606299212599,"weight":1.46},{"od_mm":110,"od_inch":4.331,"grade":"PE 100","pn":"PN 5","min":4.3,"max":4.9,"id_mm":4.149606299212599,"weight":1.46},{"od_mm":110,"od_inch":4.331,"grade":"PE 63","pn":"PN 2.5","min":3.4,"max":3.9,"id_mm":4.187007874015748,"weight":1.169},{"od_mm":110,"od_inch":4.331,"grade":"PE 80","pn":"PN 3.2","min":3.4,"max":3.9,"id_mm":4.187007874015748,"weight":1.169},{"od_mm":110,"od_inch":4.331,"grade":"PE 100","pn":"PN 4","min":3.4,"max":3.9,"id_mm":4.187007874015748,"weight":1.169},{"od_mm":110,"od_inch":4.331,"grade":"PE 63","pn":"PN 2","min":2.7,"max":3.1,"id_mm":4.216535433070866,"weight":0.936},{"od_mm":110,"od_inch":4.331,"grade":"PE 80","pn":"PN 2.5","min":2.7,"max":3.1,"id_mm":4.216535433070866,"weight":0.936},{"od_mm":110,"od_inch":4.331,"grade":"PE 100","pn":"PN 3.2","min":2.7,"max":3.1,"id_mm":4.216535433070866,"weight":0.936},{"od_mm":125,"od_inch":4.921,"grade":"PE 80","pn":"PN 20","min":20.9,"max":23.1,"id_mm":4.05511811023622,"weight":6.827},{"od_mm":125,"od_inch":4.921,"grade":"PE 80","pn":"PN 16","min":16.9,"max":18.7,"id_mm":4.220472440944882,"weight":5.749},{"od_mm":125,"od_inch":4.921,"grade":"PE 100","pn":"PN 20","min":16.9,"max":18.7,"id_mm":4.220472440944882,"weight":5.749},{"od_mm":125,"od_inch":4.921,"grade":"PE 80","pn":"PN 12.5","min":13.9,"max":15.4,"id_mm":4.344488188976378,"weight":4.87},{"od_mm":125,"od_inch":4.921,"grade":"PE 100","pn":"PN 16","min":13.9,"max":15.4,"id_mm":4.344488188976378,"weight":4.87},{"od_mm":125,"od_inch":4.921,"grade":"PE 63","pn":"PN 8","min":11.4,"max":12.7,"id_mm":4.446850393700788,"weight":4.1},{"od_mm":125,"od_inch":4.921,"grade":"PE 80","pn":"PN 10","min":11.4,"max":12.7,"id_mm":4.446850393700788,"weight":4.1},{"od_mm":125,"od_inch":4.921,"grade":"PE 100","pn":"PN 12.5","min":11.4,"max":12.7,"id_mm":4.446850393700788,"weight":4.1},{"od_mm":125,"od_inch":4.921,"grade":"PE 63","pn":"PN 6","min":9.2,"max":10.3,"id_mm":4.53740157480315,"weight":3.385},{"od_mm":125,"od_inch":4.921,"grade":"PE 80","pn":"PN 8","min":9.2,"max":10.3,"id_mm":4.53740157480315,"weight":3.385},{"od_mm":125,"od_inch":4.921,"grade":"PE 100","pn":"PN 10","min":9.2,"max":10.3,"id_mm":4.53740157480315,"weight":3.385},{"od_mm":125,"od_inch":4.921,"grade":"PE 63","pn":"PN 5","min":7.4,"max":8.3,"id_mm":4.612204724409449,"weight":2.77},{"od_mm":125,"od_inch":4.921,"grade":"PE 80","pn":"PN 6","min":7.4,"max":8.3,"id_mm":4.612204724409449,"weight":2.77},{"od_mm":125,"od_inch":4.921,"grade":"PE 100","pn":"PN 8","min":7.4,"max":8.3,"id_mm":4.612204724409449,"weight":2.77},{"od_mm":125,"od_inch":4.921,"grade":"PE 63","pn":"PN 4","min":6.0,"max":6.7,"id_mm":4.671259842519685,"weight":2.27},{"od_mm":125,"od_inch":4.921,"grade":"PE 80","pn":"PN 5","min":6.0,"max":6.7,"id_mm":4.671259842519685,"weight":2.27},{"od_mm":125,"od_inch":4.921,"grade":"PE 100","pn":"PN 6","min":6.0,"max":6.7,"id_mm":4.671259842519685,"weight":2.27},{"od_mm":125,"od_inch":4.921,"grade":"PE 63","pn":"PN 3.2","min":4.9,"max":5.5,"id_mm":4.716535433070867,"weight":1.877},{"od_mm":125,"od_inch":4.921,"grade":"PE 80","pn":"PN 4","min":4.9,"max":5.5,"id_mm":4.716535433070867,"weight":1.877},{"od_mm":125,"od_inch":4.921,"grade":"PE 100","pn":"PN 5","min":4.9,"max":5.5,"id_mm":4.716535433070867,"weight":1.877},{"od_mm":125,"od_inch":4.921,"grade":"PE 63","pn":"PN 2.5","min":3.8,"max":4.3,"id_mm":4.761811023622047,"weight":1.476},{"od_mm":125,"od_inch":4.921,"grade":"PE 80","pn":"PN 3.2","min":3.8,"max":4.3,"id_mm":4.761811023622047,"weight":1.476},{"od_mm":125,"od_inch":4.921,"grade":"PE 100","pn":"PN 4","min":3.8,"max":4.3,"id_mm":4.761811023622047,"weight":1.476},{"od_mm":125,"od_inch":4.921,"grade":"PE 63","pn":"PN 2","min":3.1,"max":3.6,"id_mm":4.789370078740158,"weight":1.227},{"od_mm":125,"od_inch":4.921,"grade":"PE 80","pn":"PN 2.5","min":3.1,"max":3.6,"id_mm":4.789370078740158,"weight":1.227},{"od_mm":125,"od_inch":4.921,"grade":"PE 100","pn":"PN 3.2","min":3.1,"max":3.6,"id_mm":4.789370078740158,"weight":1.227},{"od_mm":140,"od_inch":5.512,"grade":"PE 80","pn":"PN 20","min":23.4,"max":25.9,"id_mm":4.541338582677166,"weight":8.567},{"od_mm":140,"od_inch":5.512,"grade":"PE 80","pn":"PN 16","min":19.0,"max":21.0,"id_mm":4.724409448818898,"weight":7.231},{"od_mm":140,"od_inch":5.512,"grade":"PE 100","pn":"PN 20","min":19.0,"max":21.0,"id_mm":4.724409448818898,"weight":7.231},{"od_mm":140,"od_inch":5.512,"grade":"PE 80","pn":"PN 12.5","min":15.6,"max":17.3,"id_mm":4.8641732283464565,"weight":6.123},{"od_mm":140,"od_inch":5.512,"grade":"PE 100","pn":"PN 16","min":15.6,"max":17.3,"id_mm":4.8641732283464565,"weight":6.123},{"od_mm":140,"od_inch":5.512,"grade":"PE 63","pn":"PN 8","min":12.8,"max":14.2,"id_mm":4.980314960629921,"weight":5.145},{"od_mm":140,"od_inch":5.512,"grade":"PE 80","pn":"PN 10","min":12.8,"max":14.2,"id_mm":4.980314960629921,"weight":5.145},{"od_mm":140,"od_inch":5.512,"grade":"PE 100","pn":"PN 12.5","min":12.8,"max":14.2,"id_mm":4.980314960629921,"weight":5.145},{"od_mm":140,"od_inch":5.512,"grade":"PE 63","pn":"PN 6","min":10.3,"max":11.5,"id_mm":5.082677165354331,"weight":4.239},{"od_mm":140,"od_inch":5.512,"grade":"PE 80","pn":"PN 8","min":10.3,"max":11.5,"id_mm":5.082677165354331,"weight":4.239},{"od_mm":140,"od_inch":5.512,"grade":"PE 100","pn":"PN 10","min":10.3,"max":11.5,"id_mm":5.082677165354331,"weight":4.239},{"od_mm":140,"od_inch":5.512,"grade":"PE 63","pn":"PN 5","min":8.3,"max":9.3,"id_mm":5.165354330708661,"weight":3.478},{"od_mm":140,"od_inch":5.512,"grade":"PE 80","pn":"PN 6","min":8.3,"max":9.3,"id_mm":5.165354330708661,"weight":3.478},{"od_mm":140,"od_inch":5.512,"grade":"PE 100","pn":"PN 8","min":8.3,"max":9.3,"id_mm":5.165354330708661,"weight":3.478},{"od_mm":140,"od_inch":5.512,"grade":"PE 63","pn":"PN 4","min":6.7,"max":7.5,"id_mm":5.23228346456693,"weight":2.843},{"od_mm":140,"od_inch":5.512,"grade":"PE 80","pn":"PN 5","min":6.7,"max":7.5,"id_mm":5.23228346456693,"weight":2.843},{"od_mm":140,"od_inch":5.512,"grade":"PE 100","pn":"PN 6","min":6.7,"max":7.5,"id_mm":5.23228346456693,"weight":2.843},{"od_mm":140,"od_inch":5.512,"grade":"PE 63","pn":"PN 3.2","min":5.4,"max":6.1,"id_mm":5.285433070866142,"weight":2.325},{"od_mm":140,"od_inch":5.512,"grade":"PE 80","pn":"PN 4","min":5.4,"max":6.1,"id_mm":5.285433070866142,"weight":2.325},{"od_mm":140,"od_inch":5.512,"grade":"PE 100","pn":"PN 5","min":5.4,"max":6.1,"id_mm":5.285433070866142,"weight":2.325},{"od_mm":140,"od_inch":5.512,"grade":"PE 63","pn":"PN 2.5","min":4.3,"max":4.9,"id_mm":5.330708661417323,"weight":1.876},{"od_mm":140,"od_inch":5.512,"grade":"PE 80","pn":"PN 3.2","min":4.3,"max":4.9,"id_mm":5.330708661417323,"weight":1.876},{"od_mm":140,"od_inch":5.512,"grade":"PE 100","pn":"PN 4","min":4.3,"max":4.9,"id_mm":5.330708661417323,"weight":1.876},{"od_mm":140,"od_inch":5.512,"grade":"PE 63","pn":"PN 2","min":3.5,"max":4.0,"id_mm":5.364173228346457,"weight":1.539},{"od_mm":140,"od_inch":5.512,"grade":"PE 80","pn":"PN 2.5","min":3.5,"max":4.0,"id_mm":5.364173228346457,"weight":1.539},{"od_mm":140,"od_inch":5.512,"grade":"PE 100","pn":"PN 3.2","min":3.5,"max":4.0,"id_mm":5.364173228346457,"weight":1.539},{"od_mm":160,"od_inch":6.299,"grade":"PE 80","pn":"PN 20","min":26.7,"max":29.5,"id_mm":5.192913385826772,"weight":11.166},{"od_mm":160,"od_inch":6.299,"grade":"PE 80","pn":"PN 16","min":21.7,"max":24.0,"id_mm":5.399606299212599,"weight":9.441},{"od_mm":160,"od_inch":6.299,"grade":"PE 100","pn":"PN 20","min":21.7,"max":24.0,"id_mm":5.399606299212599,"weight":9.441},{"od_mm":160,"od_inch":6.299,"grade":"PE 80","pn":"PN 12.5","min":17.8,"max":19.7,"id_mm":5.561023622047244,"weight":7.978},{"od_mm":160,"od_inch":6.299,"grade":"PE 100","pn":"PN 16","min":17.8,"max":19.7,"id_mm":5.561023622047244,"weight":7.978},{"od_mm":160,"od_inch":6.299,"grade":"PE 63","pn":"PN 8","min":14.6,"max":16.2,"id_mm":5.692913385826771,"weight":6.708},{"od_mm":160,"od_inch":6.299,"grade":"PE 80","pn":"PN 10","min":14.6,"max":16.2,"id_mm":5.692913385826771,"weight":6.708},{"od_mm":160,"od_inch":6.299,"grade":"PE 100","pn":"PN 12.5","min":14.6,"max":16.2,"id_mm":5.692913385826771,"weight":6.708},{"od_mm":160,"od_inch":6.299,"grade":"PE 63","pn":"PN 6","min":11.8,"max":13.1,"id_mm":5.809055118110237,"weight":5.534},{"od_mm":160,"od_inch":6.299,"grade":"PE 80","pn":"PN 8","min":11.8,"max":13.1,"id_mm":5.809055118110237,"weight":5.534},{"od_mm":160,"od_inch":6.299,"grade":"PE 100","pn":"PN 10","min":11.8,"max":13.1,"id_mm":5.809055118110237,"weight":5.534},{"od_mm":160,"od_inch":6.299,"grade":"PE 63","pn":"PN 5","min":9.5,"max":10.6,"id_mm":5.903543307086614,"weight":4.539},{"od_mm":160,"od_inch":6.299,"grade":"PE 80","pn":"PN 6","min":9.5,"max":10.6,"id_mm":5.903543307086614,"weight":4.539},{"od_mm":160,"od_inch":6.299,"grade":"PE 100","pn":"PN 8","min":9.5,"max":10.6,"id_mm":5.903543307086614,"weight":4.539},{"od_mm":160,"od_inch":6.299,"grade":"PE 63","pn":"PN 4","min":7.7,"max":8.6,"id_mm":5.978346456692914,"weight":3.728},{"od_mm":160,"od_inch":6.299,"grade":"PE 80","pn":"PN 5","min":7.7,"max":8.6,"id_mm":5.978346456692914,"weight":3.728},{"od_mm":160,"od_inch":6.299,"grade":"PE 100","pn":"PN 6","min":7.7,"max":8.6,"id_mm":5.978346456692914,"weight":3.728},{"od_mm":160,"od_inch":6.299,"grade":"PE 63","pn":"PN 3.2","min":6.2,"max":7.0,"id_mm":6.039370078740158,"weight":3.05},{"od_mm":160,"od_inch":6.299,"grade":"PE 80","pn":"PN 4","min":6.2,"max":7.0,"id_mm":6.039370078740158,"weight":3.05},{"od_mm":160,"od_inch":6.299,"grade":"PE 100","pn":"PN 5","min":6.2,"max":7.0,"id_mm":6.039370078740158,"weight":3.05},{"od_mm":160,"od_inch":6.299,"grade":"PE 63","pn":"PN 2.5","min":4.9,"max":5.5,"id_mm":6.094488188976379,"weight":2.425},{"od_mm":160,"od_inch":6.299,"grade":"PE 80","pn":"PN 3.2","min":4.9,"max":5.5,"id_mm":6.094488188976379,"weight":2.425},{"od_mm":160,"od_inch":6.299,"grade":"PE 100","pn":"PN 4","min":4.9,"max":5.5,"id_mm":6.094488188976379,"weight":2.425},{"od_mm":160,"od_inch":6.299,"grade":"PE 63","pn":"PN 2","min":4.0,"max":4.5,"id_mm":6.131889763779528,"weight":1.994},{"od_mm":160,"od_inch":6.299,"grade":"PE 80","pn":"PN 2.5","min":4.0,"max":4.5,"id_mm":6.131889763779528,"weight":1.994},{"od_mm":160,"od_inch":6.299,"grade":"PE 100","pn":"PN 3.2","min":4.0,"max":4.5,"id_mm":6.131889763779528,"weight":1.994},{"od_mm":180,"od_inch":7.087,"grade":"PE 80","pn":"PN 20","min":30.0,"max":33.1,"id_mm":5.844488188976378,"weight":14.109},{"od_mm":180,"od_inch":7.087,"grade":"PE 80","pn":"PN 16","min":24.4,"max":27.0,"id_mm":6.0748031496063,"weight":11.945},{"od_mm":180,"od_inch":7.087,"grade":"PE 100","pn":"PN 20","min":24.4,"max":27.0,"id_mm":6.0748031496063,"weight":11.945},{"od_mm":180,"od_inch":7.087,"grade":"PE 80","pn":"PN 12.5","min":20.0,"max":22.1,"id_mm":6.2578740157480315,"weight":10.079},{"od_mm":180,"od_inch":7.087,"grade":"PE 100","pn":"PN 16","min":20.0,"max":22.1,"id_mm":6.2578740157480315,"weight":10.079},{"od_mm":180,"od_inch":7.087,"grade":"PE 63","pn":"PN 8","min":16.4,"max":18.2,"id_mm":6.405511811023622,"weight":8.478},{"od_mm":180,"od_inch":7.087,"grade":"PE 80","pn":"PN 10","min":16.4,"max":18.2,"id_mm":6.405511811023622,"weight":8.478},{"od_mm":180,"od_inch":7.087,"grade":"PE 100","pn":"PN 12.5","min":16.4,"max":18.2,"id_mm":6.405511811023622,"weight":8.478},{"od_mm":180,"od_inch":7.087,"grade":"PE 63","pn":"PN 6","min":13.3,"max":14.8,"id_mm":6.533464566929133,"weight":7.023},{"od_mm":180,"od_inch":7.087,"grade":"PE 80","pn":"PN 8","min":13.3,"max":14.8,"id_mm":6.533464566929133,"weight":7.023},{"od_mm":180,"od_inch":7.087,"grade":"PE 100","pn":"PN 10","min":13.3,"max":14.8,"id_mm":6.533464566929133,"weight":7.023},{"od_mm":180,"od_inch":7.087,"grade":"PE 63","pn":"PN 5","min":10.6,"max":11.8,"id_mm":6.645669291338583,"weight":5.694},{"od_mm":180,"od_inch":7.087,"grade":"PE 80","pn":"PN 6","min":10.6,"max":11.8,"id_mm":6.645669291338583,"weight":5.694},{"od_mm":180,"od_inch":7.087,"grade":"PE 100","pn":"PN 8","min":10.6,"max":11.8,"id_mm":6.645669291338583,"weight":5.694},{"od_mm":180,"od_inch":7.087,"grade":"PE 63","pn":"PN 4","min":8.6,"max":9.6,"id_mm":6.728346456692914,"weight":4.684},{"od_mm":180,"od_inch":7.087,"grade":"PE 80","pn":"PN 5","min":8.6,"max":9.6,"id_mm":6.728346456692914,"weight":4.684},{"od_mm":180,"od_inch":7.087,"grade":"PE 100","pn":"PN 6","min":8.6,"max":9.6,"id_mm":6.728346456692914,"weight":4.684},{"od_mm":180,"od_inch":7.087,"grade":"PE 63","pn":"PN 3.2","min":7.0,"max":7.8,"id_mm":6.7952755905511815,"weight":3.847},{"od_mm":180,"od_inch":7.087,"grade":"PE 80","pn":"PN 4","min":7.0,"max":7.8,"id_mm":6.7952755905511815,"weight":3.847},{"od_mm":180,"od_inch":7.087,"grade":"PE 100","pn":"PN 5","min":7.0,"max":7.8,"id_mm":6.7952755905511815,"weight":3.847},{"od_mm":180,"od_inch":7.087,"grade":"PE 63","pn":"PN 2.5","min":5.5,"max":6.2,"id_mm":6.856299212598426,"weight":3.068},{"od_mm":180,"od_inch":7.087,"grade":"PE 80","pn":"PN 3.2","min":5.5,"max":6.2,"id_mm":6.856299212598426,"weight":3.068},{"od_mm":180,"od_inch":7.087,"grade":"PE 100","pn":"PN 4","min":5.5,"max":6.2,"id_mm":6.856299212598426,"weight":3.068},{"od_mm":180,"od_inch":7.087,"grade":"PE 63","pn":"PN 2","min":4.4,"max":5.0,"id_mm":6.901574803149607,"weight":2.482},{"od_mm":180,"od_inch":7.087,"grade":"PE 80","pn":"PN 2.5","min":4.4,"max":5.0,"id_mm":6.901574803149607,"weight":2.482},{"od_mm":180,"od_inch":7.087,"grade":"PE 100","pn":"PN 3.2","min":4.4,"max":5.0,"id_mm":6.901574803149607,"weight":2.482},{"od_mm":200,"od_inch":7.874,"grade":"PE 80","pn":"PN 20","min":33.4,"max":36.9,"id_mm":6.490157480314961,"weight":17.454},{"od_mm":200,"od_inch":7.874,"grade":"PE 80","pn":"PN 16","min":27.1,"max":30.0,"id_mm":6.75,"weight":14.744},{"od_mm":200,"od_inch":7.874,"grade":"PE 100","pn":"PN 20","min":27.1,"max":30.0,"id_mm":6.75,"weight":14.744},{"od_mm":200,"od_inch":7.874,"grade":"PE 80","pn":"PN 12.5","min":22.3,"max":24.7,"id_mm":6.948818897637795,"weight":12.493},{"od_mm":200,"od_inch":7.874,"grade":"PE 100","pn":"PN 16","min":22.3,"max":24.7,"id_mm":6.948818897637795,"weight":12.493},{"od_mm":200,"od_inch":7.874,"grade":"PE 63","pn":"PN 8","min":18.2,"max":20.2,"id_mm":7.118110236220473,"weight":10.456},{"od_mm":200,"od_inch":7.874,"grade":"PE 80","pn":"PN 10","min":18.2,"max":20.2,"id_mm":7.118110236220473,"weight":10.456},{"od_mm":200,"od_inch":7.874,"grade":"PE 100","pn":"PN 12.5","min":18.2,"max":20.2,"id_mm":7.118110236220473,"weight":10.456},{"od_mm":200,"od_inch":7.874,"grade":"PE 63","pn":"PN 6","min":14.8,"max":16.4,"id_mm":7.25984251968504,"weight":8.664},{"od_mm":200,"od_inch":7.874,"grade":"PE 80","pn":"PN 8","min":14.8,"max":16.4,"id_mm":7.25984251968504,"weight":8.664},{"od_mm":200,"od_inch":7.874,"grade":"PE 100","pn":"PN 10","min":14.8,"max":16.4,"id_mm":7.25984251968504,"weight":8.664},{"od_mm":200,"od_inch":7.874,"grade":"PE 63","pn":"PN 5","min":11.8,"max":13.1,"id_mm":7.383858267716536,"weight":7.033},{"od_mm":200,"od_inch":7.874,"grade":"PE 80","pn":"PN 6","min":11.8,"max":13.1,"id_mm":7.383858267716536,"weight":7.033},{"od_mm":200,"od_inch":7.874,"grade":"PE 100","pn":"PN 8","min":11.8,"max":13.1,"id_mm":7.383858267716536,"weight":7.033},{"od_mm":200,"od_inch":7.874,"grade":"PE 63","pn":"PN 4","min":9.6,"max":10.7,"id_mm":7.474409448818898,"weight":5.804},{"od_mm":200,"od_inch":7.874,"grade":"PE 80","pn":"PN 5","min":9.6,"max":10.7,"id_mm":7.474409448818898,"weight":5.804},{"od_mm":200,"od_inch":7.874,"grade":"PE 100","pn":"PN 6","min":9.6,"max":10.7,"id_mm":7.474409448818898,"weight":5.804},{"od_mm":200,"od_inch":7.874,"grade":"PE 63","pn":"PN 3.2","min":7.7,"max":8.6,"id_mm":7.553149606299213,"weight":4.709},{"od_mm":200,"od_inch":7.874,"grade":"PE 80","pn":"PN 4","min":7.7,"max":8.6,"id_mm":7.553149606299213,"weight":4.709},{"od_mm":200,"od_inch":7.874,"grade":"PE 100","pn":"PN 5","min":7.7,"max":8.6,"id_mm":7.553149606299213,"weight":4.709},{"od_mm":200,"od_inch":7.874,"grade":"PE 63","pn":"PN 2.5","min":6.1,"max":6.9,"id_mm":7.618110236220473,"weight":3.788},{"od_mm":200,"od_inch":7.874,"grade":"PE 80","pn":"PN 3.2","min":6.1,"max":6.9,"id_mm":7.618110236220473,"weight":3.788},{"od_mm":200,"od_inch":7.874,"grade":"PE 100","pn":"PN 4","min":6.1,"max":6.9,"id_mm":7.618110236220473,"weight":3.788},{"od_mm":200,"od_inch":7.874,"grade":"PE 63","pn":"PN 2","min":4.9,"max":5.5,"id_mm":7.669291338582678,"weight":3.051},{"od_mm":200,"od_inch":7.874,"grade":"PE 80","pn":"PN 2.5","min":4.9,"max":5.5,"id_mm":7.669291338582678,"weight":3.051},{"od_mm":200,"od_inch":7.874,"grade":"PE 100","pn":"PN 3.2","min":4.9,"max":5.5,"id_mm":7.669291338582678,"weight":3.051},{"od_mm":225,"od_inch":8.858,"grade":"PE 80","pn":"PN 20","min":37.5,"max":41.4,"id_mm":7.305118110236221,"weight":22.052},{"od_mm":225,"od_inch":8.858,"grade":"PE 80","pn":"PN 16","min":30.5,"max":33.7,"id_mm":7.594488188976379,"weight":18.654},{"od_mm":225,"od_inch":8.858,"grade":"PE 100","pn":"PN 20","min":30.5,"max":33.7,"id_mm":7.594488188976379,"weight":18.654},{"od_mm":225,"od_inch":8.858,"grade":"PE 80","pn":"PN 12.5","min":25.0,"max":27.6,"id_mm":7.822834645669292,"weight":15.743},{"od_mm":225,"od_inch":8.858,"grade":"PE 100","pn":"PN 16","min":25.0,"max":27.6,"id_mm":7.822834645669292,"weight":15.743},{"od_mm":225,"od_inch":8.858,"grade":"PE 63","pn":"PN 8","min":20.5,"max":22.7,"id_mm":8.007874015748031,"weight":13.235},{"od_mm":225,"od_inch":8.858,"grade":"PE 80","pn":"PN 10","min":20.5,"max":22.7,"id_mm":8.007874015748031,"weight":13.235},{"od_mm":225,"od_inch":8.858,"grade":"PE 100","pn":"PN 12.5","min":20.5,"max":22.7,"id_mm":8.007874015748031,"weight":13.235},{"od_mm":225,"od_inch":8.858,"grade":"PE 63","pn":"PN 6","min":16.6,"max":18.4,"id_mm":8.169291338582678,"weight":10.938},{"od_mm":225,"od_inch":8.858,"grade":"PE 80","pn":"PN 8","min":16.6,"max":18.4,"id_mm":8.169291338582678,"weight":10.938},{"od_mm":225,"od_inch":8.858,"grade":"PE 100","pn":"PN 10","min":16.6,"max":18.4,"id_mm":8.169291338582678,"weight":10.938},{"od_mm":225,"od_inch":8.858,"grade":"PE 63","pn":"PN 5","min":13.3,"max":14.8,"id_mm":8.30511811023622,"weight":8.928},{"od_mm":225,"od_inch":8.858,"grade":"PE 80","pn":"PN 6","min":13.3,"max":14.8,"id_mm":8.30511811023622,"weight":8.928},{"od_mm":225,"od_inch":8.858,"grade":"PE 100","pn":"PN 8","min":13.3,"max":14.8,"id_mm":8.30511811023622,"weight":8.928},{"od_mm":225,"od_inch":8.858,"grade":"PE 63","pn":"PN 4","min":10.8,"max":12.0,"id_mm":8.409448818897639,"weight":7.335},{"od_mm":225,"od_inch":8.858,"grade":"PE 80","pn":"PN 5","min":10.8,"max":12.0,"id_mm":8.409448818897639,"weight":7.335},{"od_mm":225,"od_inch":8.858,"grade":"PE 100","pn":"PN 6","min":10.8,"max":12.0,"id_mm":8.409448818897639,"weight":7.335},{"od_mm":225,"od_inch":8.858,"grade":"PE 63","pn":"PN 3.2","min":8.7,"max":9.7,"id_mm":8.496062992125985,"weight":5.98},{"od_mm":225,"od_inch":8.858,"grade":"PE 80","pn":"PN 4","min":8.7,"max":9.7,"id_mm":8.496062992125985,"weight":5.98},{"od_mm":225,"od_inch":8.858,"grade":"PE 100","pn":"PN 5","min":8.7,"max":9.7,"id_mm":8.496062992125985,"weight":5.98},{"od_mm":225,"od_inch":8.858,"grade":"PE 63","pn":"PN 2.5","min":6.9,"max":7.7,"id_mm":8.570866141732283,"weight":4.787},{"od_mm":225,"od_inch":8.858,"grade":"PE 80","pn":"PN 3.2","min":6.9,"max":7.7,"id_mm":8.570866141732283,"weight":4.787},{"od_mm":225,"od_inch":8.858,"grade":"PE 100","pn":"PN 4","min":6.9,"max":7.7,"id_mm":8.570866141732283,"weight":4.787},{"od_mm":225,"od_inch":8.858,"grade":"PE 63","pn":"PN 2","min":5.5,"max":6.2,"id_mm":8.627952755905513,"weight":3.862},{"od_mm":225,"od_inch":8.858,"grade":"PE 80","pn":"PN 2.5","min":5.5,"max":6.2,"id_mm":8.627952755905513,"weight":3.862},{"od_mm":225,"od_inch":8.858,"grade":"PE 100","pn":"PN 3.2","min":5.5,"max":6.2,"id_mm":8.627952755905513,"weight":3.862},{"od_mm":250,"od_inch":9.843,"grade":"PE 80","pn":"PN 20","min":41.7,"max":46.0,"id_mm":8.116141732283465,"weight":27.23},{"od_mm":250,"od_inch":9.843,"grade":"PE 80","pn":"PN 16","min":33.8,"max":37.3,"id_mm":8.442913385826772,"weight":22.964},{"od_mm":250,"od_inch":9.843,"grade":"PE 100","pn":"PN 20","min":33.8,"max":37.3,"id_mm":8.442913385826772,"weight":22.964},{"od_mm":250,"od_inch":9.843,"grade":"PE 80","pn":"PN 12.5","min":27.8,"max":30.7,"id_mm":8.690944881889765,"weight":19.449},{"od_mm":250,"od_inch":9.843,"grade":"PE 100","pn":"PN 16","min":27.8,"max":30.7,"id_mm":8.690944881889765,"weight":19.449},{"od_mm":250,"od_inch":9.843,"grade":"PE 63","pn":"PN 8","min":22.8,"max":25.2,"id_mm":8.89763779527559,"weight":16.337},{"od_mm":250,"od_inch":9.843,"grade":"PE 80","pn":"PN 10","min":22.8,"max":25.2,"id_mm":8.89763779527559,"weight":16.337},{"od_mm":250,"od_inch":9.843,"grade":"PE 100","pn":"PN 12.5","min":22.8,"max":25.2,"id_mm":8.89763779527559,"weight":16.337},{"od_mm":250,"od_inch":9.843,"grade":"PE 63","pn":"PN 6","min":18.4,"max":20.4,"id_mm":9.078740157480315,"weight":13.474},{"od_mm":250,"od_inch":9.843,"grade":"PE 80","pn":"PN 8","min":18.4,"max":20.4,"id_mm":9.078740157480315,"weight":13.474},{"od_mm":250,"od_inch":9.843,"grade":"PE 100","pn":"PN 10","min":18.4,"max":20.4,"id_mm":9.078740157480315,"weight":13.474},{"od_mm":250,"od_inch":9.843,"grade":"PE 63","pn":"PN 5","min":14.8,"max":16.4,"id_mm":9.228346456692915,"weight":11.014},{"od_mm":250,"od_inch":9.843,"grade":"PE 80","pn":"PN 6","min":14.8,"max":16.4,"id_mm":9.228346456692915,"weight":11.014},{"od_mm":250,"od_inch":9.843,"grade":"PE 100","pn":"PN 8","min":14.8,"max":16.4,"id_mm":9.228346456692915,"weight":11.014},{"od_mm":250,"od_inch":9.843,"grade":"PE 63","pn":"PN 4","min":12.0,"max":13.3,"id_mm":9.344488188976378,"weight":9.043},{"od_mm":250,"od_inch":9.843,"grade":"PE 80","pn":"PN 5","min":12.0,"max":13.3,"id_mm":9.344488188976378,"weight":9.043},{"od_mm":250,"od_inch":9.843,"grade":"PE 100","pn":"PN 6","min":12.0,"max":13.3,"id_mm":9.344488188976378,"weight":9.043},{"od_mm":250,"od_inch":9.843,"grade":"PE 63","pn":"PN 3.2","min":9.7,"max":10.8,"id_mm":9.438976377952756,"weight":7.402},{"od_mm":250,"od_inch":9.843,"grade":"PE 80","pn":"PN 4","min":9.7,"max":10.8,"id_mm":9.438976377952756,"weight":7.402},{"od_mm":250,"od_inch":9.843,"grade":"PE 100","pn":"PN 5","min":9.7,"max":10.8,"id_mm":9.438976377952756,"weight":7.402},{"od_mm":250,"od_inch":9.843,"grade":"PE 63","pn":"PN 2.5","min":7.6,"max":8.5,"id_mm":9.525590551181102,"weight":5.866},{"od_mm":250,"od_inch":9.843,"grade":"PE 80","pn":"PN 3.2","min":7.6,"max":8.5,"id_mm":9.525590551181102,"weight":5.866},{"od_mm":250,"od_inch":9.843,"grade":"PE 100","pn":"PN 4","min":7.6,"max":8.5,"id_mm":9.525590551181102,"weight":5.866},{"od_mm":250,"od_inch":9.843,"grade":"PE 63","pn":"PN 2","min":6.1,"max":6.9,"id_mm":9.586614173228346,"weight":4.767},{"od_mm":250,"od_inch":9.843,"grade":"PE 80","pn":"PN 2.5","min":6.1,"max":6.9,"id_mm":9.586614173228346,"weight":4.767},{"od_mm":250,"od_inch":9.843,"grade":"PE 100","pn":"PN 3.2","min":6.1,"max":6.9,"id_mm":9.586614173228346,"weight":4.767},{"od_mm":280,"od_inch":11.024,"grade":"PE 80","pn":"PN 20","min":46.7,"max":51.5,"id_mm":9.090551181102363,"weight":34.152},{"od_mm":280,"od_inch":11.024,"grade":"PE 80","pn":"PN 16","min":37.9,"max":41.8,"id_mm":9.45472440944882,"weight":28.828},{"od_mm":280,"od_inch":11.024,"grade":"PE 100","pn":"PN 20","min":37.9,"max":41.8,"id_mm":9.45472440944882,"weight":28.828},{"od_mm":280,"od_inch":11.024,"grade":"PE 80","pn":"PN 12.5","min":31.2,"max":34.5,"id_mm":9.730314960629922,"weight":24.455},{"od_mm":280,"od_inch":11.024,"grade":"PE 100","pn":"PN 16","min":31.2,"max":34.5,"id_mm":9.730314960629922,"weight":24.455},{"od_mm":280,"od_inch":11.024,"grade":"PE 63","pn":"PN 8","min":25.5,"max":28.2,"id_mm":9.966535433070867,"weight":20.474},{"od_mm":280,"od_inch":11.024,"grade":"PE 80","pn":"PN 10","min":25.5,"max":28.2,"id_mm":9.966535433070867,"weight":20.474},{"od_mm":280,"od_inch":11.024,"grade":"PE 100","pn":"PN 12.5","min":25.5,"max":28.2,"id_mm":9.966535433070867,"weight":20.474},{"od_mm":280,"od_inch":11.024,"grade":"PE 63","pn":"PN 6","min":20.6,"max":22.8,"id_mm":10.169291338582678,"weight":16.883},{"od_mm":280,"od_inch":11.024,"grade":"PE 80","pn":"PN 8","min":20.6,"max":22.8,"id_mm":10.169291338582678,"weight":16.883},{"od_mm":280,"od_inch":11.024,"grade":"PE 100","pn":"PN 10","min":20.6,"max":22.8,"id_mm":10.169291338582678,"weight":16.883},{"od_mm":280,"od_inch":11.024,"grade":"PE 63","pn":"PN 5","min":16.5,"max":18.3,"id_mm":10.338582677165356,"weight":13.763},{"od_mm":280,"od_inch":11.024,"grade":"PE 80","pn":"PN 6","min":16.5,"max":18.3,"id_mm":10.338582677165356,"weight":13.763},{"od_mm":280,"od_inch":11.024,"grade":"PE 100","pn":"PN 8","min":16.5,"max":18.3,"id_mm":10.338582677165356,"weight":13.763},{"od_mm":280,"od_inch":11.024,"grade":"PE 63","pn":"PN 4","min":13.4,"max":14.9,"id_mm":10.466535433070868,"weight":11.331},{"od_mm":280,"od_inch":11.024,"grade":"PE 80","pn":"PN 5","min":13.4,"max":14.9,"id_mm":10.466535433070868,"weight":11.331},{"od_mm":280,"od_inch":11.024,"grade":"PE 100","pn":"PN 6","min":13.4,"max":14.9,"id_mm":10.466535433070868,"weight":11.331},{"od_mm":280,"od_inch":11.024,"grade":"PE 63","pn":"PN 3.2","min":10.8,"max":12.0,"id_mm":10.5748031496063,"weight":9.223},{"od_mm":280,"od_inch":11.024,"grade":"PE 80","pn":"PN 4","min":10.8,"max":12.0,"id_mm":10.5748031496063,"weight":9.223},{"od_mm":280,"od_inch":11.024,"grade":"PE 100","pn":"PN 5","min":10.8,"max":12.0,"id_mm":10.5748031496063,"weight":9.223},{"od_mm":280,"od_inch":11.024,"grade":"PE 63","pn":"PN 2.5","min":8.5,"max":9.5,"id_mm":10.669291338582678,"weight":7.346},{"od_mm":280,"od_inch":11.024,"grade":"PE 80","pn":"PN 3.2","min":8.5,"max":9.5,"id_mm":10.669291338582678,"weight":7.346},{"od_mm":280,"od_inch":11.024,"grade":"PE 100","pn":"PN 4","min":8.5,"max":9.5,"id_mm":10.669291338582678,"weight":7.346},{"od_mm":280,"od_inch":11.024,"grade":"PE 63","pn":"PN 2","min":6.9,"max":7.7,"id_mm":10.736220472440944,"weight":5.996},{"od_mm":280,"od_inch":11.024,"grade":"PE 80","pn":"PN 2.5","min":6.9,"max":7.7,"id_mm":10.736220472440944,"weight":5.996},{"od_mm":280,"od_inch":11.024,"grade":"PE 100","pn":"PN 3.2","min":6.9,"max":7.7,"id_mm":10.736220472440944,"weight":5.996},{"od_mm":315,"od_inch":12.402,"grade":"PE 80","pn":"PN 20","min":52.5,"max":57.9,"id_mm":10.228346456692915,"weight":43.199},{"od_mm":315,"od_inch":12.402,"grade":"PE 80","pn":"PN 16","min":42.6,"max":47.0,"id_mm":10.637795275590552,"weight":36.463},{"od_mm":315,"od_inch":12.402,"grade":"PE 100","pn":"PN 20","min":42.6,"max":47.0,"id_mm":10.637795275590552,"weight":36.463},{"od_mm":315,"od_inch":12.402,"grade":"PE 80","pn":"PN 12.5","min":35.0,"max":38.6,"id_mm":10.952755905511811,"weight":30.838},{"od_mm":315,"od_inch":12.402,"grade":"PE 100","pn":"PN 16","min":35.0,"max":38.6,"id_mm":10.952755905511811,"weight":30.838},{"od_mm":315,"od_inch":12.402,"grade":"PE 63","pn":"PN 8","min":28.7,"max":31.7,"id_mm":11.212598425196852,"weight":25.907},{"od_mm":315,"od_inch":12.402,"grade":"PE 80","pn":"PN 10","min":28.7,"max":31.7,"id_mm":11.212598425196852,"weight":25.907},{"od_mm":315,"od_inch":12.402,"grade":"PE 100","pn":"PN 12.5","min":28.7,"max":31.7,"id_mm":11.212598425196852,"weight":25.907},{"od_mm":315,"od_inch":12.402,"grade":"PE 63","pn":"PN 6","min":23.2,"max":25.7,"id_mm":11.438976377952757,"weight":21.397},{"od_mm":315,"od_inch":12.402,"grade":"PE 80","pn":"PN 8","min":23.2,"max":25.7,"id_mm":11.438976377952757,"weight":21.397},{"od_mm":315,"od_inch":12.402,"grade":"PE 100","pn":"PN 10","min":23.2,"max":25.7,"id_mm":11.438976377952757,"weight":21.397},{"od_mm":315,"od_inch":12.402,"grade":"PE 63","pn":"PN 5","min":18.6,"max":20.6,"id_mm":11.629921259842519,"weight":17.439},{"od_mm":315,"od_inch":12.402,"grade":"PE 80","pn":"PN 6","min":18.6,"max":20.6,"id_mm":11.629921259842519,"weight":17.439},{"od_mm":315,"od_inch":12.402,"grade":"PE 100","pn":"PN 8","min":18.6,"max":20.6,"id_mm":11.629921259842519,"weight":17.439},{"od_mm":315,"od_inch":12.402,"grade":"PE 63","pn":"PN 4","min":15.0,"max":16.6,"id_mm":11.779527559055119,"weight":14.239},{"od_mm":315,"od_inch":12.402,"grade":"PE 80","pn":"PN 5","min":15.0,"max":16.6,"id_mm":11.779527559055119,"weight":14.239},{"od_mm":315,"od_inch":12.402,"grade":"PE 100","pn":"PN 6","min":15.0,"max":16.6,"id_mm":11.779527559055119,"weight":14.239},{"od_mm":315,"od_inch":12.402,"grade":"PE 63","pn":"PN 3.2","min":12.2,"max":13.6,"id_mm":11.893700787401576,"weight":11.738},{"od_mm":315,"od_inch":12.402,"grade":"PE 80","pn":"PN 4","min":12.2,"max":13.6,"id_mm":11.893700787401576,"weight":11.738},{"od_mm":315,"od_inch":12.402,"grade":"PE 100","pn":"PN 5","min":12.2,"max":13.6,"id_mm":11.893700787401576,"weight":11.738},{"od_mm":315,"od_inch":12.402,"grade":"PE 63","pn":"PN 2.5","min":9.6,"max":10.7,"id_mm":12.00196850393701,"weight":9.32},{"od_mm":315,"od_inch":12.402,"grade":"PE 80","pn":"PN 3.2","min":9.6,"max":10.7,"id_mm":12.00196850393701,"weight":9.32},{"od_mm":315,"od_inch":12.402,"grade":"PE 100","pn":"PN 4","min":9.6,"max":10.7,"id_mm":12.00196850393701,"weight":9.32},{"od_mm":315,"od_inch":12.402,"grade":"PE 63","pn":"PN 2","min":7.7,"max":8.6,"id_mm":12.080708661417324,"weight":7.532},{"od_mm":315,"od_inch":12.402,"grade":"PE 80","pn":"PN 2.5","min":7.7,"max":8.6,"id_mm":12.080708661417324,"weight":7.532},{"od_mm":315,"od_inch":12.402,"grade":"PE 100","pn":"PN 3.2","min":7.7,"max":8.6,"id_mm":12.080708661417324,"weight":7.532},{"od_mm":355,"od_inch":13.976,"grade":"PE 80","pn":"PN 20","min":59.2,"max":65.3,"id_mm":11.525590551181104,"weight":54.9},{"od_mm":355,"od_inch":13.976,"grade":"PE 80","pn":"PN 16","min":48.0,"max":52.9,"id_mm":11.990157480314961,"weight":46.286},{"od_mm":355,"od_inch":13.976,"grade":"PE 100","pn":"PN 20","min":48.0,"max":52.9,"id_mm":11.990157480314961,"weight":46.286},{"od_mm":355,"od_inch":13.976,"grade":"PE 80","pn":"PN 12.5","min":39.5,"max":43.6,"id_mm":12.340551181102363,"weight":39.233},{"od_mm":355,"od_inch":13.976,"grade":"PE 100","pn":"PN 16","min":39.5,"max":43.6,"id_mm":12.340551181102363,"weight":39.233},{"od_mm":355,"od_inch":13.976,"grade":"PE 63","pn":"PN 8","min":32.3,"max":35.7,"id_mm":12.637795275590552,"weight":32.877},{"od_mm":355,"od_inch":13.976,"grade":"PE 80","pn":"PN 10","min":32.3,"max":35.7,"id_mm":12.637795275590552,"weight":32.877},{"od_mm":355,"od_inch":13.976,"grade":"PE 100","pn":"PN 12.5","min":32.3,"max":35.7,"id_mm":12.637795275590552,"weight":32.877},{"od_mm":355,"od_inch":13.976,"grade":"PE 63","pn":"PN 6","min":26.2,"max":29.0,"id_mm":12.88976377952756,"weight":27.22},{"od_mm":355,"od_inch":13.976,"grade":"PE 80","pn":"PN 8","min":26.2,"max":29.0,"id_mm":12.88976377952756,"weight":27.22},{"od_mm":355,"od_inch":13.976,"grade":"PE 100","pn":"PN 10","min":26.2,"max":29.0,"id_mm":12.88976377952756,"weight":27.22},{"od_mm":355,"od_inch":13.976,"grade":"PE 63","pn":"PN 5","min":20.9,"max":23.1,"id_mm":13.110236220472443,"weight":22.068},{"od_mm":355,"od_inch":13.976,"grade":"PE 80","pn":"PN 6","min":20.9,"max":23.1,"id_mm":13.110236220472443,"weight":22.068},{"od_mm":355,"od_inch":13.976,"grade":"PE 100","pn":"PN 8","min":20.9,"max":23.1,"id_mm":13.110236220472443,"weight":22.068},{"od_mm":355,"od_inch":13.976,"grade":"PE 63","pn":"PN 4","min":17.0,"max":18.8,"id_mm":13.271653543307089,"weight":18.176},{"od_mm":355,"od_inch":13.976,"grade":"PE 80","pn":"PN 5","min":17.0,"max":18.8,"id_mm":13.271653543307089,"weight":18.176},{"od_mm":355,"od_inch":13.976,"grade":"PE 100","pn":"PN 6","min":17.0,"max":18.8,"id_mm":13.271653543307089,"weight":18.176},{"od_mm":355,"od_inch":13.976,"grade":"PE 63","pn":"PN 3.2","min":13.7,"max":15.2,"id_mm":13.407480314960631,"weight":14.823},{"od_mm":355,"od_inch":13.976,"grade":"PE 80","pn":"PN 4","min":13.7,"max":15.2,"id_mm":13.407480314960631,"weight":14.823},{"od_mm":355,"od_inch":13.976,"grade":"PE 100","pn":"PN 5","min":13.7,"max":15.2,"id_mm":13.407480314960631,"weight":14.823},{"od_mm":355,"od_inch":13.976,"grade":"PE 63","pn":"PN 2.5","min":10.8,"max":12.0,"id_mm":13.527559055118111,"weight":11.799},{"od_mm":355,"od_inch":13.976,"grade":"PE 80","pn":"PN 3.2","min":10.8,"max":12.0,"id_mm":13.527559055118111,"weight":11.799},{"od_mm":355,"od_inch":13.976,"grade":"PE 100","pn":"PN 4","min":10.8,"max":12.0,"id_mm":13.527559055118111,"weight":11.799},{"od_mm":355,"od_inch":13.976,"grade":"PE 63","pn":"PN 2","min":8.7,"max":9.7,"id_mm":13.614173228346457,"weight":9.583},{"od_mm":355,"od_inch":13.976,"grade":"PE 80","pn":"PN 2.5","min":8.7,"max":9.7,"id_mm":13.614173228346457,"weight":9.583},{"od_mm":355,"od_inch":13.976,"grade":"PE 100","pn":"PN 3.2","min":8.7,"max":9.7,"id_mm":13.614173228346457,"weight":9.583},{"od_mm":400,"od_inch":15.748,"grade":"PE 80","pn":"PN 20","min":66.7,"max":73.5,"id_mm":12.988188976377952,"weight":69.662},{"od_mm":400,"od_inch":15.748,"grade":"PE 80","pn":"PN 16","min":54.1,"max":59.7,"id_mm":13.507874015748033,"weight":58.804},{"od_mm":400,"od_inch":15.748,"grade":"PE 100","pn":"PN 20","min":54.1,"max":59.7,"id_mm":13.507874015748033,"weight":58.804},{"od_mm":400,"od_inch":15.748,"grade":"PE 80","pn":"PN 12.5","min":44.5,"max":49.1,"id_mm":13.905511811023622,"weight":49.789},{"od_mm":400,"od_inch":15.748,"grade":"PE 100","pn":"PN 16","min":44.5,"max":49.1,"id_mm":13.905511811023622,"weight":49.789},{"od_mm":400,"od_inch":15.748,"grade":"PE 63","pn":"PN 8","min":36.4,"max":40.2,"id_mm":14.240157480314961,"weight":41.726},{"od_mm":400,"od_inch":15.748,"grade":"PE 80","pn":"PN 10","min":36.4,"max":40.2,"id_mm":14.240157480314961,"weight":41.726},{"od_mm":400,"od_inch":15.748,"grade":"PE 100","pn":"PN 12.5","min":36.4,"max":40.2,"id_mm":14.240157480314961,"weight":41.726},{"od_mm":400,"od_inch":15.748,"grade":"PE 63","pn":"PN 6","min":29.5,"max":32.6,"id_mm":14.525590551181102,"weight":34.505},{"od_mm":400,"od_inch":15.748,"grade":"PE 80","pn":"PN 8","min":29.5,"max":32.6,"id_mm":14.525590551181102,"weight":34.505},{"od_mm":400,"od_inch":15.748,"grade":"PE 100","pn":"PN 10","min":29.5,"max":32.6,"id_mm":14.525590551181102,"weight":34.505},{"od_mm":400,"od_inch":15.748,"grade":"PE 63","pn":"PN 5","min":23.6,"max":26.1,"id_mm":14.769685039370078,"weight":28.079},{"od_mm":400,"od_inch":15.748,"grade":"PE 80","pn":"PN 6","min":23.6,"max":26.1,"id_mm":14.769685039370078,"weight":28.079},{"od_mm":400,"od_inch":15.748,"grade":"PE 100","pn":"PN 8","min":23.6,"max":26.1,"id_mm":14.769685039370078,"weight":28.079},{"od_mm":400,"od_inch":15.748,"grade":"PE 63","pn":"PN 4","min":19.1,"max":21.2,"id_mm":14.95472440944882,"weight":23.053},{"od_mm":400,"od_inch":15.748,"grade":"PE 80","pn":"PN 5","min":19.1,"max":21.2,"id_mm":14.95472440944882,"weight":23.053},{"od_mm":400,"od_inch":15.748,"grade":"PE 100","pn":"PN 6","min":19.1,"max":21.2,"id_mm":14.95472440944882,"weight":23.053},{"od_mm":400,"od_inch":15.748,"grade":"PE 63","pn":"PN 3.2","min":15.4,"max":17.1,"id_mm":15.108267716535433,"weight":18.782},{"od_mm":400,"od_inch":15.748,"grade":"PE 80","pn":"PN 4","min":15.4,"max":17.1,"id_mm":15.108267716535433,"weight":18.782},{"od_mm":400,"od_inch":15.748,"grade":"PE 100","pn":"PN 5","min":15.4,"max":17.1,"id_mm":15.108267716535433,"weight":18.782},{"od_mm":400,"od_inch":15.748,"grade":"PE 63","pn":"PN 2.5","min":12.2,"max":13.6,"id_mm":15.240157480314963,"weight":15.04},{"od_mm":400,"od_inch":15.748,"grade":"PE 80","pn":"PN 3.2","min":12.2,"max":13.6,"id_mm":15.240157480314963,"weight":15.04},{"od_mm":400,"od_inch":15.748,"grade":"PE 100","pn":"PN 4","min":12.2,"max":13.6,"id_mm":15.240157480314963,"weight":15.04},{"od_mm":400,"od_inch":15.748,"grade":"PE 63","pn":"PN 2","min":9.8,"max":10.9,"id_mm":15.340551181102363,"weight":12.147},{"od_mm":400,"od_inch":15.748,"grade":"PE 80","pn":"PN 2.5","min":9.8,"max":10.9,"id_mm":15.340551181102363,"weight":12.147},{"od_mm":400,"od_inch":15.748,"grade":"PE 100","pn":"PN 3.2","min":9.8,"max":10.9,"id_mm":15.340551181102363,"weight":12.147},{"od_mm":450,"od_inch":17.717,"grade":"PE 80","pn":"PN 20","min":75.0,"max":82.6,"id_mm":14.614173228346457,"weight":88.111},{"od_mm":450,"od_inch":17.717,"grade":"PE 80","pn":"PN 16","min":60.9,"max":67.1,"id_mm":15.196850393700789,"weight":74.413},{"od_mm":450,"od_inch":17.717,"grade":"PE 100","pn":"PN 20","min":60.9,"max":67.1,"id_mm":15.196850393700789,"weight":74.413},{"od_mm":450,"od_inch":17.717,"grade":"PE 80","pn":"PN 12.5","min":50.0,"max":55.1,"id_mm":15.64763779527559,"weight":62.912},{"od_mm":450,"od_inch":17.717,"grade":"PE 100","pn":"PN 16","min":50.0,"max":55.1,"id_mm":15.64763779527559,"weight":62.912},{"od_mm":450,"od_inch":17.717,"grade":"PE 63","pn":"PN 8","min":41.0,"max":45.2,"id_mm":16.019685039370078,"weight":52.824},{"od_mm":450,"od_inch":17.717,"grade":"PE 80","pn":"PN 10","min":41.0,"max":45.2,"id_mm":16.019685039370078,"weight":52.824},{"od_mm":450,"od_inch":17.717,"grade":"PE 100","pn":"PN 12.5","min":41.0,"max":45.2,"id_mm":16.019685039370078,"weight":52.824},{"od_mm":450,"od_inch":17.717,"grade":"PE 63","pn":"PN 6","min":33.1,"max":36.6,"id_mm":16.344488188976378,"weight":43.578},{"od_mm":450,"od_inch":17.717,"grade":"PE 80","pn":"PN 8","min":33.1,"max":36.6,"id_mm":16.344488188976378,"weight":43.578},{"od_mm":450,"od_inch":17.717,"grade":"PE 100","pn":"PN 10","min":33.1,"max":36.6,"id_mm":16.344488188976378,"weight":43.578},{"od_mm":450,"od_inch":17.717,"grade":"PE 63","pn":"PN 5","min":26.5,"max":29.3,"id_mm":16.618110236220474,"weight":35.471},{"od_mm":450,"od_inch":17.717,"grade":"PE 80","pn":"PN 6","min":26.5,"max":29.3,"id_mm":16.618110236220474,"weight":35.471},{"od_mm":450,"od_inch":17.717,"grade":"PE 100","pn":"PN 8","min":26.5,"max":29.3,"id_mm":16.618110236220474,"weight":35.471},{"od_mm":450,"od_inch":17.717,"grade":"PE 63","pn":"PN 4","min":21.5,"max":23.8,"id_mm":16.8248031496063,"weight":29.154},{"od_mm":450,"od_inch":17.717,"grade":"PE 80","pn":"PN 5","min":21.5,"max":23.8,"id_mm":16.8248031496063,"weight":29.154},{"od_mm":450,"od_inch":17.717,"grade":"PE 100","pn":"PN 6","min":21.5,"max":23.8,"id_mm":16.8248031496063,"weight":29.154},{"od_mm":450,"od_inch":17.717,"grade":"PE 63","pn":"PN 3.2","min":17.4,"max":19.3,"id_mm":16.994094488188978,"weight":23.857},{"od_mm":450,"od_inch":17.717,"grade":"PE 80","pn":"PN 4","min":17.4,"max":19.3,"id_mm":16.994094488188978,"weight":23.857},{"od_mm":450,"od_inch":17.717,"grade":"PE 100","pn":"PN 5","min":17.4,"max":19.3,"id_mm":16.994094488188978,"weight":23.857},{"od_mm":450,"od_inch":17.717,"grade":"PE 63","pn":"PN 2.5","min":13.7,"max":15.2,"id_mm":17.147637795275593,"weight":18.956},{"od_mm":450,"od_inch":17.717,"grade":"PE 80","pn":"PN 3.2","min":13.7,"max":15.2,"id_mm":17.147637795275593,"weight":18.956},{"od_mm":450,"od_inch":17.717,"grade":"PE 100","pn":"PN 4","min":13.7,"max":15.2,"id_mm":17.147637795275593,"weight":18.956},{"od_mm":450,"od_inch":17.717,"grade":"PE 63","pn":"PN 2","min":11.0,"max":12.2,"id_mm":17.25984251968504,"weight":15.317},{"od_mm":450,"od_inch":17.717,"grade":"PE 80","pn":"PN 2.5","min":11.0,"max":12.2,"id_mm":17.25984251968504,"weight":15.317},{"od_mm":450,"od_inch":17.717,"grade":"PE 100","pn":"PN 3.2","min":11.0,"max":12.2,"id_mm":17.25984251968504,"weight":15.317}];
+const REF_DATA = [{"od_inch":0.79,"od_mm":20},{"od_inch":0.98,"od_mm":25},{"od_inch":1.26,"od_mm":32},{"od_inch":1.57,"od_mm":40},{"od_inch":1.97,"od_mm":50},{"od_inch":2.48,"od_mm":63},{"od_inch":2.95,"od_mm":75},{"od_inch":3.54,"od_mm":90},{"od_inch":4.33,"od_mm":110},{"od_inch":4.92,"od_mm":125},{"od_inch":5.51,"od_mm":140},{"od_inch":6.3,"od_mm":160},{"od_inch":7.09,"od_mm":180},{"od_inch":7.87,"od_mm":200},{"od_inch":8.86,"od_mm":225},{"od_inch":9.84,"od_mm":250},{"od_inch":11.02,"od_mm":280},{"od_inch":12.4,"od_mm":315},{"od_inch":13.98,"od_mm":355},{"od_inch":15.75,"od_mm":400},{"od_inch":17.72,"od_mm":450}];
+
+// ── MRP Calculation ───────────────────────────────────────────────────────────
+function fn(n, d = 2) {
+  if (n === null || n === undefined || isNaN(+n)) return '—';
+  return (+n).toFixed(d).replace(/\.0+$/, '').replace(/(\.\d*?)0+$/, '$1');
+}
+function getCalcRate() {
+  const vRate  = parseFloat(document.getElementById('virginRate').value);
+  const vPct   = parseFloat(document.getElementById('virginPct').value);
+  const rpRate = parseFloat(document.getElementById('rpRate').value);
+  const conv   = parseFloat(document.getElementById('convCost').value) || 0;
+  const rpPct  = 100 - (isNaN(vPct) ? 100 : vPct);
+
+  // Need at least virgin rate to compute
+  const hasVirgin = !isNaN(vRate) && vRate >= 0;
+  const hasRP     = !isNaN(rpRate) && rpRate >= 0;
+  if (!hasVirgin) return null;
+
+  const vShare  = isNaN(vPct)  ? 1 : Math.min(Math.max(vPct, 0), 100) / 100;
+  const rpShare = 1 - vShare;
+
+  // If RP % > 0 but no RP rate entered, skip RP contribution
+  const blended = vRate * vShare + (hasRP ? rpRate * rpShare : vRate * rpShare);
+  const final   = blended + conv;
+  return { blended, final };
+}
+
+function getMRP(weight) {
+  const r = getCalcRate();
+  if (!r) return '—';
+  return '₹ ' + (r.final * weight).toFixed(2);
+}
+function getMRPVal(weight) {
+  const r = getCalcRate();
+  if (!r) return null;
+  return r.final * weight;
+}
+function updateRateDisplays(weight) {
+  const r = getCalcRate();
+  const blendedTxt  = r ? '₹ ' + r.blended.toFixed(2) : '—';
+  const finalTxt    = r ? '₹ ' + r.final.toFixed(2)   : '—';
+  document.getElementById('blendedDisplay').textContent   = blendedTxt;
+  document.getElementById('finalRateDisplay').textContent = finalTxt;
+  document.getElementById('finalRateMobile').textContent  = finalTxt;
+  if (r && weight != null) {
+    document.getElementById('mrpDisplay').textContent = '₹ ' + (r.final * weight).toFixed(2);
+  } else if (r) {
+    document.getElementById('mrpDisplay').textContent = 'Select pipe';
+  } else {
+    document.getElementById('mrpDisplay').textContent = '—';
+  }
+}
+
+// ── OD Reference Grid ────────────────────────────────────────────────────────
+function buildRef() {
+  const grid = document.getElementById('odGrid');
+  grid.innerHTML = REF_DATA.map(r => `
+    <div class="od-chip">
+      <div class="od-mm">${r.od_mm}</div>
+      <div class="od-inch">${fn(r.od_inch, 2)}"</div>
+    </div>
+  `).join('');
+}
+
+// ── Dropdowns ─────────────────────────────────────────────────────────────────
+const odSel = document.getElementById('odSel');
+const gradeSel = document.getElementById('gradeSel');
+const pnSel = document.getElementById('pnSel');
+
+function uniq(arr) {
+  return [...new Set(arr)].sort((a,b) => {
+    const na = +a, nb = +b;
+    if (!isNaN(na) && !isNaN(nb)) return na - nb;
+    return String(a).localeCompare(String(b), undefined, {numeric:true});
+  });
+}
+function populateODs() {
+  odSel.innerHTML = '<option value="">Select OD</option>' +
+    uniq(PIPE_DATA.map(r => r.od_mm)).map(v => `<option value="${v}">${v}</option>`).join('');
+  gradeSel.innerHTML = '<option value="">Select Grade</option>';
+  pnSel.innerHTML = '<option value="">Select PN</option>';
+}
+function populateGrades() {
+  const od = odSel.value;
+  gradeSel.innerHTML = '<option value="">Select Grade</option>' +
+    uniq(PIPE_DATA.filter(r => String(r.od_mm) === od).map(r => r.grade))
+      .map(v => `<option value="${v}">${v}</option>`).join('');
+  pnSel.innerHTML = '<option value="">Select PN</option>';
+}
+function populatePNs() {
+  const od = odSel.value, gr = gradeSel.value;
+  pnSel.innerHTML = '<option value="">Select PN</option>' +
+    uniq(PIPE_DATA.filter(r => String(r.od_mm) === od && r.grade === gr).map(r => r.pn))
+      .map(v => `<option value="${v}">${v}</option>`).join('');
+}
+function getSelected() {
+  return PIPE_DATA.find(r =>
+    String(r.od_mm) === odSel.value && r.grade === gradeSel.value && r.pn === pnSel.value
+  ) || null;
+}
+
+// ── Exact Result + Equivalents ────────────────────────────────────────────────
+function renderExact() {
+  const rec = getSelected();
+  const exactEl = document.getElementById('exactResult');
+  const tbody = document.querySelector('#equivTable tbody');
+  const badge = document.getElementById('equivBadge');
+
+  if (!rec) {
+    exactEl.innerHTML = '<div class="result-empty">Choose OD, Grade and PN to see the exact row.</div>';
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="8">Equivalent combinations will appear here.</td></tr>';
+    badge.textContent = '';
+    updateRateDisplays(null);
+    return;
+  }
+
+  const mrp = getMRP(rec.weight);
+  // Update the top MRP box when a pipe is selected
+  updateRateDisplays(rec.weight);
+
+  exactEl.innerHTML = `
+    <div class="pills-grid">
+      <div class="pill"><div class="k">OD</div><div class="v">${rec.od_mm} mm</div></div>
+      <div class="pill"><div class="k">Grade</div><div class="v">${rec.grade}</div></div>
+      <div class="pill"><div class="k">PN</div><div class="v">${rec.pn}</div></div>
+      <div class="pill blue"><div class="k">ID</div><div class="v">${fn(rec.id_mm, 2)} mm</div></div>
+      <div class="pill"><div class="k">Wall Min</div><div class="v">${fn(rec.min, 1)}</div></div>
+      <div class="pill"><div class="k">Wall Max</div><div class="v">${fn(rec.max, 1)}</div></div>
+      <div class="pill"><div class="k">Weight</div><div class="v">${fn(rec.weight, 3)} kg/m</div></div>
+      <div class="pill accent"><div class="k">MRP</div><div class="v">${mrp}</div></div>
+    </div>
+  `;
+
+  const equivs = PIPE_DATA.filter(r =>
+    String(r.od_mm) === String(rec.od_mm) && r.min === rec.min && r.max === rec.max
+  ).sort((a,b) => String(a.grade).localeCompare(String(b.grade), undefined, {numeric:true}));
+
+  badge.textContent = equivs.length + ' matches';
+  badge.className = 'badge green';
+  tbody.innerHTML = equivs.map(r => `
+    <tr>
+      <td>${r.od_mm}</td><td>${r.grade}</td><td>${r.pn}</td>
+      <td>${fn(r.min,1)}</td><td>${fn(r.max,1)}</td>
+      <td>${fn(r.id_mm,2)}</td><td>${fn(r.weight,3)}</td>
+      <td class="mrp-cell">${getMRP(r.weight)}</td>
+    </tr>
+  `).join('');
+}
+
+// ── ID Search ─────────────────────────────────────────────────────────────────
+function searchByID() {
+  const id = parseFloat(document.getElementById('idInput').value);
+  const tol = Math.abs(parseFloat(document.getElementById('tolInput').value || '0.05'));
+  const summaryEl = document.getElementById('idSummary');
+  const tbody = document.querySelector('#idTable tbody');
+  const badge = document.getElementById('idBadge');
+
+  if (isNaN(id)) {
+    summaryEl.innerHTML = '<div class="result-empty">Please enter a valid ID value.</div>';
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="8">No result.</td></tr>';
+    badge.textContent = '';
+    return;
+  }
+
+  // Sort by weight ascending (as requested)
+  const results = PIPE_DATA
+    .filter(r => Math.abs(r.id_mm - id) <= tol)
+    .sort((a,b) => a.weight - b.weight);
+
+  badge.textContent = results.length + ' matches';
+  badge.className = results.length ? 'badge green' : 'badge';
+
+  summaryEl.innerHTML = `
+    <div class="pills-grid">
+      <div class="pill blue"><div class="k">Searched ID</div><div class="v">${fn(id,2)} mm</div></div>
+      <div class="pill"><div class="k">Tolerance</div><div class="v">±${fn(tol,3)}</div></div>
+      <div class="pill"><div class="k">Range</div><div class="v">${fn(id-tol,3)} – ${fn(id+tol,3)}</div></div>
+      <div class="pill accent"><div class="k">Matches</div><div class="v">${results.length}</div></div>
+    </div>
+  `;
+
+  if (!results.length) {
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="8">No matching pipes found in this range.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = results.map(r => `
+    <tr>
+      <td>${r.od_mm}</td><td>${r.grade}</td><td>${r.pn}</td>
+      <td>${fn(r.min,1)}</td><td>${fn(r.max,1)}</td>
+      <td>${fn(r.id_mm,2)}</td><td>${fn(r.weight,3)}</td>
+      <td class="mrp-cell">${getMRP(r.weight)}</td>
+    </tr>
+  `).join('');
+}
+
+// ── MRP live update ───────────────────────────────────────────────────────────
+function refreshAllMRP() {
+  // Sync RP % = 100 - Virgin %
+  const vPct = parseFloat(document.getElementById('virginPct').value);
+  document.getElementById('rpPct').value = isNaN(vPct) ? '' : Math.max(0, 100 - Math.min(100, vPct));
+
+  const rec = getSelected();
+  updateRateDisplays(rec ? rec.weight : null);
+
+  if (rec) renderExact();
+  const idInput = document.getElementById('idInput').value;
+  if (idInput) searchByID();
+}
+
+// ── Events ───────────────────────────────────────────────────────────────────
+odSel.addEventListener('change', () => { populateGrades(); renderExact(); });
+gradeSel.addEventListener('change', () => { populatePNs(); renderExact(); });
+pnSel.addEventListener('change', renderExact);
+document.getElementById('findBtn').addEventListener('click', renderExact);
+document.getElementById('idBtn').addEventListener('click', searchByID);
+document.getElementById('idInput').addEventListener('keydown', e => { if (e.key === 'Enter') searchByID(); });
+
+['virginRate','virginPct','rpRate','convCost'].forEach(id => {
+  document.getElementById(id).addEventListener('input', refreshAllMRP);
+});
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+buildRef();
+populateODs();
+</script>
+</body>
+</html>
